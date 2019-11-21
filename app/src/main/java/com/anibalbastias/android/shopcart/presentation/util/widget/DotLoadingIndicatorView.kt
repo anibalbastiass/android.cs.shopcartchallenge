@@ -28,7 +28,7 @@ import com.anibalbastias.android.shopcart.presentation.util.dpToPx
 class DotLoadingIndicatorView : View {
 
     /**
-     * Dots amount
+     * Dots productAmountData
      */
     private var dotAmount: Int = 0
 
@@ -276,7 +276,7 @@ class DotLoadingIndicatorView : View {
     }
 
     /**
-     * Set amount of dots, it will be restarted your view
+     * Set productAmountData of dots, it will be restarted your view
      *
      * @param amount number of dots, dot size automatically adjust
      */

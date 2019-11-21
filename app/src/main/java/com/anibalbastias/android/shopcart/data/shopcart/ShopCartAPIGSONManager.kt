@@ -1,7 +1,5 @@
 package com.anibalbastias.android.shopcart.data.shopcart
 
-import com.anibalbastias.android.shopcart.data.dataStoreFactory.common.WrapperData
-import com.anibalbastias.android.shopcart.data.shopcart.deserializer.ShopCartWrapperDeserializer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
@@ -21,7 +19,7 @@ class ShopCartAPIGSONManager private constructor() {
     private fun createGsonBuilder(): GsonBuilder {
         val gsonBuilder = GsonBuilder()
 
-        gsonBuilder.registerTypeAdapter(WrapperData::class.java, ShopCartWrapperDeserializer())
+//        gsonBuilder.registerTypeAdapter(WrapperData::class.java, ShopCartWrapperDeserializer())
 
         return gsonBuilder
     }

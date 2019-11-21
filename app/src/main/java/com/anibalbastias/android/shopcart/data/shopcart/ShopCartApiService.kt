@@ -1,7 +1,14 @@
 package com.anibalbastias.android.shopcart.data.shopcart
 
-import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.CounterData
+import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.CounterData
+import com.anibalbastias.android.shopcart.data.dataStoreFactory.products.model.ProductsData
 import com.anibalbastias.android.shopcart.data.dataStoreFactory.search.model.SearchMusicData
+import com.anibalbastias.android.shopcart.data.shopcart.ShopCartApiConstants.DELETE_COUNTER
+import com.anibalbastias.android.shopcart.data.shopcart.ShopCartApiConstants.GET_COUNTERS
+import com.anibalbastias.android.shopcart.data.shopcart.ShopCartApiConstants.GET_PRODUCTS
+import com.anibalbastias.android.shopcart.data.shopcart.ShopCartApiConstants.POST_COUNTER
+import com.anibalbastias.android.shopcart.data.shopcart.ShopCartApiConstants.POST_COUNTER_DEC
+import com.anibalbastias.android.shopcart.data.shopcart.ShopCartApiConstants.POST_COUNTER_INC
 import io.reactivex.Flowable
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -14,25 +21,29 @@ import retrofit2.http.Url
 
 interface ShopCartApiService {
 
-    //Get Search Data
+    // Dummy
     @GET
     fun searchMusic(@Url nextUrl: String): Flowable<SearchMusicData>
 
-    @GET("api/v1/products")
-    fun getProducts(): Flowable<List<CounterData>>
+    //region Products
+    @GET(GET_PRODUCTS)
+    fun getProducts(): Flowable<ProductsData>
+    //endregion
 
-    @GET("api/v1/counters")
+    //region Counters
+    @GET(GET_COUNTERS)
     fun getCounters(): Flowable<List<CounterData>>
 
-    @POST("api/v1/counter")
+    @POST(POST_COUNTER)
     fun postCounter(): Flowable<List<CounterData>>
 
-    @POST("api/v1/counter/inc")
+    @POST(POST_COUNTER_INC)
     fun postIncCounter(): Flowable<List<CounterData>>
 
-    @POST("api/v1/counter/dec")
+    @POST(POST_COUNTER_DEC)
     fun postDecCounter(): Flowable<List<CounterData>>
 
-    @DELETE("api/v1/counter")
+    @DELETE(DELETE_COUNTER)
     fun deleteCounter(): Flowable<List<CounterData>>
+    //endregion
 }

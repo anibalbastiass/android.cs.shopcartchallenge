@@ -1,4 +1,4 @@
-package com.anibalbastias.android.shopcart.data.dataStoreFactory.counters
+package com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model
 
 import com.google.gson.annotations.SerializedName
 
