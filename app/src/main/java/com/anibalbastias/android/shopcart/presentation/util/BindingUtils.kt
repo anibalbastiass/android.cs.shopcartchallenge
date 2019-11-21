@@ -6,7 +6,6 @@ import android.widget.EditText
 import androidx.databinding.BindingAdapter
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.anibalbastias.android.shopcart.presentation.ui.search.interfaces.SearchListener
 import com.anibalbastias.android.shopcart.presentation.util.adapter.base.BaseBindClickHandler
 import com.anibalbastias.android.shopcart.presentation.util.adapter.base.SingleLayoutBindRecyclerAdapter
 import com.anibalbastias.android.shopcart.presentation.util.widget.WrapContentLinearLayoutManager
@@ -15,32 +14,6 @@ import com.anibalbastias.android.shopcart.presentation.util.widget.WrapContentLi
 fun ImageView.setImageUrl(imageUrl: String?) {
     imageUrl?.let {
         loadImageWithoutPlaceholder(imageUrl)
-    }
-}
-
-@BindingAdapter("setImageUrlCenterCrop")
-fun ImageView.setImageUrlCenterCrop(imageUrl: String?) {
-    imageUrl?.let {
-        loadImageWithoutPlaceholderCenterCrop(imageUrl)
-    }
-}
-
-@BindingAdapter("sendEditTextAction")
-fun EditText.sendEditTextAction(callback: SearchListener?) {
-    setOnEditorActionListener { view, actionId, event ->
-        view?.hideKeyboard()
-        try {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH
-                || actionId == EditorInfo.IME_ACTION_DONE
-                || event.action == KeyEvent.ACTION_DOWN &&
-                event.keyCode == KeyEvent.KEYCODE_ENTER) {
-                callback?.onSendActionByHeaderFinder()
-                true
-            }
-        } catch (e: Exception) {
-            callback?.onSendActionByHeaderFinder()
-        }
-        true
     }
 }
 

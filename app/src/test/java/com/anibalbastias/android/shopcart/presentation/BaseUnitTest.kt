@@ -1,4 +1,4 @@
-package au.com.carsales.autogate
+package com.anibalbastias.android.shopcart.presentation
 
 import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule

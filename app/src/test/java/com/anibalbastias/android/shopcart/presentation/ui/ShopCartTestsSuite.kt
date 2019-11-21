@@ -1,7 +1,5 @@
 package com.anibalbastias.android.shopcart.presentation.ui
 
-import com.anibalbastias.android.shopcart.presentation.ui.resultitem.viewmodel.ResultItemViewModelTest
-import com.anibalbastias.android.shopcart.presentation.ui.search.viewmodel.SearchMusicViewModelTest
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 
@@ -11,8 +9,8 @@ import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
-        ResultItemViewModelTest::class,
-        SearchMusicViewModelTest::class
+//        ResultItemViewModelTest::class,
+//        SearchMusicViewModelTest::class
 )
 class ShopCartTestsSuite {
     /**

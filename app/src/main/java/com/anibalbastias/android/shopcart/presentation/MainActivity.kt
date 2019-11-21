@@ -7,7 +7,7 @@ import androidx.navigation.Navigation
 import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.presentation.ui.entry.EntryFragment
 import com.anibalbastias.android.shopcart.presentation.ui.entry.OnBackPressedListener
-import com.anibalbastias.android.shopcart.presentation.ui.search.SearchFragment
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.ShopCartFragment
 import kotlinx.android.synthetic.main.fragment_entry.*
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     override fun onAttachFragment(fragment: Fragment) {
         super.onAttachFragment(fragment)
 
-        if (fragment is SearchFragment) {
+        if (fragment is ShopCartFragment) {
             entryFragment = (fragment as? EntryFragment)!!
         }
     }

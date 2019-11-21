@@ -7,8 +7,7 @@ import com.anibalbastias.android.shopcart.presentation.MainActivity
 import com.anibalbastias.android.shopcart.base.module.component.BaseApplicationComponent
 import com.anibalbastias.android.shopcart.presentation.module.ShopCartRepositoryModule
 import com.anibalbastias.android.shopcart.presentation.ui.entry.EntryFragment
-import com.anibalbastias.android.shopcart.presentation.ui.resultitem.ResultItemFragment
-import com.anibalbastias.android.shopcart.presentation.ui.search.SearchFragment
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.ShopCartFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -27,6 +26,5 @@ interface ApplicationComponent : BaseApplicationComponent, FragmentInjector {
 
 interface FragmentInjector {
     fun inject(entryFragment: EntryFragment)
-    fun inject(searchFragment: SearchFragment)
-    fun inject(resultItemFragment: ResultItemFragment)
+    fun inject(shopCartFragment: ShopCartFragment)
 }

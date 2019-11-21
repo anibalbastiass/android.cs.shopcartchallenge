@@ -1,5 +1,6 @@
 package com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model
 
+import com.anibalbastias.android.shopcart.data.dataStoreFactory.common.TypeData
 import com.google.gson.annotations.SerializedName
 
 data class CounterData(
@@ -12,4 +13,4 @@ data class CounterData(
 
     @field:SerializedName("count")
     var count: Int? = null
-)
+) : TypeData()

@@ -8,8 +8,8 @@ import io.reactivex.Flowable
  */
 interface ICountersRepository {
     fun getCounters(): Flowable<List<CounterData>>
-    fun postCounter(): Flowable<List<CounterData>>
-    fun postIncCounter(): Flowable<List<CounterData>>
-    fun postDecCounter(): Flowable<List<CounterData>>
-    fun deleteCounter(): Flowable<List<CounterData>>
+    fun postCounter(request: CounterData): Flowable<List<CounterData>>
+    fun postIncCounter(request: CounterData): Flowable<List<CounterData>>
+    fun postDecCounter(request: CounterData): Flowable<List<CounterData>>
+    fun deleteCounter(request: CounterData): Flowable<List<CounterData>>
 }
