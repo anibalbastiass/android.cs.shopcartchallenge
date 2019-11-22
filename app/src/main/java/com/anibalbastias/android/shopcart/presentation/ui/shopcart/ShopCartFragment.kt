@@ -12,13 +12,12 @@ import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBindin
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
-import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarTitle
-import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
-import com.anibalbastias.android.shopcart.presentation.util.toast
+import com.anibalbastias.android.shopcart.presentation.util.*
 
-class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsViewData> {
+class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItemViewData> {
 
     override fun tagName(): String = this::class.java.simpleName
     override fun layoutId(): Int = R.layout.fragment_shop_cart_list
@@ -33,15 +32,6 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsView
         sharedViewModel = activity!!.getViewModel(SavedStateViewModelFactory(getAppContext(), this))
         shopCartViewModel = getViewModel(viewModelFactory)
         setHasOptionsMenu(true)
-
-        // Test
-        val list = arrayListOf<ProductsViewData?>()
-
-        for (i in 1 until 10) {
-            list.add(ProductsViewData())
-        }
-
-        shopCartViewModel.shopCartList.set(list)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,6 +46,49 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsView
         binding.lifecycleOwner = this
 
         initToolbar()
+        initViewModel()
+        fetchProducts()
+    }
+
+    private fun initViewModel() {
+        implementObserver(shopCartViewModel.getProductsLiveData(),
+            successBlock = { viewData -> getProductsData(viewData) },
+            loadingBlock = { showLoadingView() },
+            errorBlock = { showErrorView(it) })
+    }
+
+    private fun getProductsData(viewData: ProductsViewData) {
+        shopCartViewModel.isLoading.set(false)
+        shopCartViewModel.isError.set(false)
+        binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
+
+        shopCartViewModel.shopCartList.set(
+            viewData.products as? ArrayList<ProductsItemViewData?>
+        )
+    }
+
+    private fun showErrorView(errorMessage: String?) {
+        shopCartViewModel.isLoading.set(false)
+    }
+
+    private fun showLoadingView() {
+        shopCartViewModel.isLoading.set(true)
+    }
+
+    private fun fetchProducts() {
+        shopCartViewModel.apply {
+            getProductsLiveData().value?.data?.let {
+                getProductsData(it)
+            } ?: run {
+                isLoading.set(true)
+                fetchAllProducts()
+            }
+
+            // Set Swipe Refresh Layout
+            binding.shopCartListSwipeRefreshLayout?.initSwipe {
+                fetchAllProducts()
+            }
+        }
     }
 
     private fun initToolbar() {
@@ -65,19 +98,19 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsView
         }
     }
 
-    override fun onAddCounterItem(item: ProductsViewData) {
+    override fun onAddCounterItem(item: ProductsItemViewData) {
         activity?.toast("Add")
     }
 
-    override fun onIncCounterItem(item: ProductsViewData) {
+    override fun onIncCounterItem(item: ProductsItemViewData) {
         activity?.toast("Inc")
     }
 
-    override fun onDecCounterItem(item: ProductsViewData) {
+    override fun onDecCounterItem(item: ProductsItemViewData) {
         activity?.toast("Dec")
     }
 
-    override fun onDeleteCounterItem(item: ProductsViewData) {
+    override fun onDeleteCounterItem(item: ProductsItemViewData) {
         activity?.toast("Delete")
     }
 }
