@@ -24,9 +24,6 @@
         android:layout_marginTop="16sp"
         android:layout_marginEnd="16sp"
         android:background="@color/white"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="4dp"
         card_view:cardUseCompatPadding="false">
@@ -43,20 +40,21 @@
                 bind:layout_constraintBottom_toBottomOf="parent"
                 bind:layout_constraintStart_toStartOf="parent"
                 bind:layout_constraintTop_toTopOf="parent"
-                tools:src="@mipmap/ic_launcher_round" />
+                tools:src="@mipmap/ic_launcher" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/shopCartItemContent"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
-                bind:layout_constraintHorizontal_weight="1"
                 android:layout_marginStart="10dp"
+                bind:layout_constraintEnd_toStartOf="@+id/shopCartItemCounters"
+                bind:layout_constraintHorizontal_weight="1"
                 bind:layout_constraintStart_toEndOf="@+id/shopCartItemImageView"
                 bind:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/shopCartItemTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/opensans_semibold"
                     bind:layout_constraintBottom_toTopOf="@+id/shopCartItemSubtitle"
@@ -67,7 +65,7 @@
 
                 <TextView
                     android:id="@+id/shopCartItemSubtitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/opensans_regular"
                     bind:layout_constraintBottom_toBottomOf="parent"
@@ -82,11 +80,9 @@
                 android:id="@+id/shopCartItemCounters"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
-                android:layout_marginStart="10dp"
-                bind:layout_constraintWidth_percent=".25"
                 bind:layout_constraintBottom_toBottomOf="parent"
                 bind:layout_constraintEnd_toEndOf="parent"
-                bind:layout_constraintStart_toEndOf="@+id/shopCartItemContent"
+                bind:layout_constraintHorizontal_weight="0.25"
                 bind:layout_constraintTop_toTopOf="parent">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -105,8 +101,9 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/shopCartItemDecButton"
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:fontFamily="@font/opensans_semibold"
                     android:maxLines="1"
                     android:text="-"
                     android:textColor="@color/white"
@@ -118,8 +115,9 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/shopCartItemIncButton"
-                    android:layout_width="30dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:fontFamily="@font/opensans_semibold"
                     android:maxLines="1"
                     android:text="+"
                     android:textColor="@color/white"
@@ -132,12 +130,12 @@
                     android:id="@+id/shopCartItemSum"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/opensans_semibold"
+                    android:gravity="center"
                     android:maxLines="1"
                     android:text="3 pc"
-                    android:gravity="center"
                     android:textColor="@color/primaryColor"
                     android:textSize="13sp"
-                    android:fontFamily="@font/opensans_semibold"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintTop_toTopOf="parent" />

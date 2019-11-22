@@ -1,29 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <import type="android.view.View" />
+
+        <variable
+            name="shopCartViewModel"
+            type="com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel" />
+
+        <variable
+            name="shopCartItemListener"
+            type="com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener" />
 
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/backgroundColor">
 
-        <TextView
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/shopCartToolbar"
             android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:theme="@style/ToolBarDetailsStyle"
+            app:titleTextColor="@color/primaryColor"
+            tools:title="@string/app_name" />
+
+        <com.anibalbastias.android.shopcart.presentation.util.widget.DotLoadingIndicatorView
+            android:id="@+id/shopCartLoader"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
-            android:text="Hello World!"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/shopCartToolbar" />
 
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/shopCartListSwipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/shopCartToolbar">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/shopCartListRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:visibility="visible"
+                bind:loadAdapterData="@{shopCartViewModel.shopCartList}"
+                bind:loadAdapterLayout="@{shopCartViewModel.shopCartItemLayout}"
+                bind:loadAdapterListener="@{shopCartItemListener}"
+                tools:listitem="@layout/view_cell_shop_cart_item" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <include
+            android:id="@+id/shopCartEmptyContainer"
+            layout="@layout/view_cell_shop_cart_empty"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/shopCartToolbar"
+            android:visibility="gone"
+            tools:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
