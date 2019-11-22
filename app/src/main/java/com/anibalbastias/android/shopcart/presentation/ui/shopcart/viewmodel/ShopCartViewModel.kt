@@ -6,9 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.view.BaseViewModel
 import com.anibalbastias.android.shopcart.base.view.Resource
-import com.anibalbastias.android.shopcart.data.dataStoreFactory.products.model.ProductsData
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterViewDataMapper
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import javax.inject.Inject
 
 class ShopCartViewModel @Inject constructor(
@@ -17,8 +19,9 @@ class ShopCartViewModel @Inject constructor(
     private val postCountersUseCase: PostCountersUseCase,
     private val postIncCountersUseCase: PostIncCountersUseCase,
     private val postDecCountersUseCase: PostDecCountersUseCase,
-    private val deleteCountersUseCase: DeleteCountersUseCase
-    //private val searchViewDataMapper: SearchViewDataMapper
+    private val deleteCountersUseCase: DeleteCountersUseCase,
+    private val productsViewDataMapper: ProductsViewDataMapper,
+    private val counterViewDataMapper: CounterViewDataMapper
 ) : BaseViewModel() {
 
     // region Observables
@@ -26,13 +29,22 @@ class ShopCartViewModel @Inject constructor(
     var isError: ObservableBoolean = ObservableBoolean(false)
     // endregion
 
+    override fun onCleared() {
+        getProductsUseCase.dispose()
+        getCountersUseCase.dispose()
+        postCountersUseCase.dispose()
+        postIncCountersUseCase.dispose()
+        postDecCountersUseCase.dispose()
+        deleteCountersUseCase.dispose()
+        super.onCleared()
+    }
 
     var shopCartItemLayout: Int = R.layout.view_cell_shop_cart_item
-    var shopCartList: ObservableField<ArrayList<ProductsData?>> =
+    var shopCartList: ObservableField<ArrayList<ProductsViewData?>> =
         ObservableField(
             arrayListOf()
         )
 
-    private val getProductsLiveData: MutableLiveData<Resource<ProductsData>> =
+    private val getProductsLiveData: MutableLiveData<Resource<ProductsViewData>> =
         MutableLiveData()
 }

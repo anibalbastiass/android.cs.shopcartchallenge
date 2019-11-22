@@ -8,18 +8,17 @@ import androidx.lifecycle.SavedStateViewModelFactory
 import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.module.getViewModel
 import com.anibalbastias.android.shopcart.base.view.BaseModuleFragment
-import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.CounterData
-import com.anibalbastias.android.shopcart.data.dataStoreFactory.products.model.ProductsData
 import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBinding
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
 import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarTitle
-import com.anibalbastias.android.shopcart.presentation.util.setArrowUpToolbar
 import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
+import com.anibalbastias.android.shopcart.presentation.util.toast
 
-class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<CounterData> {
+class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsViewData> {
 
     override fun tagName(): String = this::class.java.simpleName
     override fun layoutId(): Int = R.layout.fragment_shop_cart_list
@@ -36,17 +35,12 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<CounterData>
         setHasOptionsMenu(true)
 
         // Test
-        val list = arrayListOf<ProductsData?>()
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
-        list.add(ProductsData())
+        val list = arrayListOf<ProductsViewData?>()
+
+        for (i in 1 until 10) {
+            list.add(ProductsViewData())
+        }
+
         shopCartViewModel.shopCartList.set(list)
     }
 
@@ -71,23 +65,19 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<CounterData>
         }
     }
 
-    override fun onClickView(view: View, item: CounterData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onAddCounterItem(item: ProductsViewData) {
+        activity?.toast("Add")
     }
 
-    override fun onAddCounterItem(item: CounterData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onIncCounterItem(item: ProductsViewData) {
+        activity?.toast("Inc")
     }
 
-    override fun onIncCounterItem(item: CounterData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onDecCounterItem(item: ProductsViewData) {
+        activity?.toast("Dec")
     }
 
-    override fun onDecCounterItem(item: CounterData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onDeleteCounterItem(item: CounterData) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onDeleteCounterItem(item: ProductsViewData) {
+        activity?.toast("Delete")
     }
 }
