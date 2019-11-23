@@ -34,7 +34,39 @@
             app:layout_constraintTop_toTopOf="parent"
             app:theme="@style/ToolBarDetailsStyle"
             app:titleTextColor="@color/primaryColor"
-            tools:title="@string/app_name" />
+            tools:title="@string/app_name">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_shopping_cart" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="23dp"
+                    android:layout_marginStart="25dp"
+                    android:background="@drawable/box_counter"
+                    android:gravity="center"
+                    android:minWidth="23dp"
+                    android:padding="3dp"
+                    android:text="@{``+ shopCartViewModel.shopCartTotalCount}"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:visibility="@{shopCartViewModel.shopCartTotalCount > 0 ? View.VISIBLE : View.GONE}" />
+
+            </RelativeLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <com.anibalbastias.android.shopcart.presentation.util.widget.DotLoadingIndicatorView
             android:id="@+id/shopCartLoader"
@@ -79,11 +111,11 @@
             layout="@layout/view_cell_shop_cart_empty"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/shopCartToolbar"
-            android:visibility="gone"
             tools:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,11 +12,13 @@ import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBindin
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
-import com.anibalbastias.android.shopcart.presentation.util.*
+import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarTitle
+import com.anibalbastias.android.shopcart.presentation.util.implementObserver
+import com.anibalbastias.android.shopcart.presentation.util.initSwipe
+import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
 
 class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItemViewData> {
 
@@ -41,7 +43,6 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         setNavController(this@ShopCartFragment.view)
 
         binding = DataBindingUtil.bind<ViewDataBinding>(view) as FragmentShopCartListBinding
-        //binding.sharedViewModel = sharedViewModel
         binding.shopCartViewModel = shopCartViewModel
         binding.shopCartItemListener = this
         binding.lifecycleOwner = this
@@ -100,26 +101,18 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     override fun onAddCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.shopCartList.get()?.map {
-            if (it?.itemId == item.itemId) {
-                item.counter?.set(CounterViewData(count = 0))
-            }
-        }
+        shopCartViewModel.addCounterItem(item)
     }
 
     override fun onIncCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.shopCartList.get()?.map {
-            if (it?.itemId == item.itemId) {
-                //item.counter?.set(item.counter.get().count + 1)
-            }
-        }
+        shopCartViewModel.onIncCounterItem(item)
     }
 
     override fun onDecCounterItem(item: ProductsItemViewData) {
-        activity?.toast("Dec")
+        shopCartViewModel.onDecCounterItem(item)
     }
 
     override fun onDeleteCounterItem(item: ProductsItemViewData) {
-        activity?.toast("Delete")
+        shopCartViewModel.onDeleteCounterItem(item)
     }
 }
