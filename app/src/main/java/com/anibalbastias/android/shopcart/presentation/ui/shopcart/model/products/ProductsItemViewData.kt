@@ -1,6 +1,8 @@
 package com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products
 
 import android.os.Parcelable
+import androidx.databinding.ObservableField
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -9,5 +11,6 @@ data class ProductsItemViewData(
     val productAmountData: ProductAmountViewData? = null,
     val subtitle: String? = null,
     val imageUrl: String? = null,
-    val title: String? = null
+    val title: String? = null,
+    var counter: ObservableField<CounterViewData>? = null
 ) : Parcelable

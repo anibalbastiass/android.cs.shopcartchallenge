@@ -7,5 +7,5 @@ import kotlinx.android.parcel.Parcelize
 data class CounterViewData(
     var id: String? = null,
     var title: String? = null,
-    var count: Int? = null
+    var count: Int? = 0
 ) : Parcelable

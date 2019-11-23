@@ -12,6 +12,7 @@ import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBindin
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
@@ -99,11 +100,19 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     override fun onAddCounterItem(item: ProductsItemViewData) {
-        activity?.toast("Add")
+        shopCartViewModel.shopCartList.get()?.map {
+            if (it?.itemId == item.itemId) {
+                item.counter?.set(CounterViewData(count = 0))
+            }
+        }
     }
 
     override fun onIncCounterItem(item: ProductsItemViewData) {
-        activity?.toast("Inc")
+        shopCartViewModel.shopCartList.get()?.map {
+            if (it?.itemId == item.itemId) {
+                //item.counter?.set(item.counter.get().count + 1)
+            }
+        }
     }
 
     override fun onDecCounterItem(item: ProductsItemViewData) {

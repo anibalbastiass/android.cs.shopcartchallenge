@@ -90,14 +90,15 @@
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/shopCartItemAddButton"
-                    android:layout_width="0dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:onClick="@{() -> clickHandler.onAddCounterItem(item)}"
                     android:text="ADD TO CART"
                     android:textColor="@color/white"
                     android:textSize="11sp"
-                    android:visibility="gone"
+                    android:visibility="@{item.counter == null ? View.VISIBLE : View.GONE}"
+                    tools:visibility="visible"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintStart_toStartOf="parent"
@@ -113,10 +114,12 @@
                     android:text="-"
                     android:textColor="@color/white"
                     android:textSize="13sp"
+                    android:visibility="@{item.counter != null ? View.VISIBLE : View.GONE}"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toStartOf="@+id/shopCartItemIncButton"
                     bind:layout_constraintStart_toStartOf="parent"
-                    bind:layout_constraintTop_toTopOf="parent" />
+                    bind:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/shopCartItemIncButton"
@@ -128,9 +131,11 @@
                     android:text="+"
                     android:textColor="@color/white"
                     android:textSize="13sp"
+                    android:visibility="@{item.counter != null ? View.VISIBLE : View.GONE}"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toStartOf="@+id/shopCartItemSum"
-                    bind:layout_constraintTop_toTopOf="parent" />
+                    bind:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone" />
 
                 <TextView
                     android:id="@+id/shopCartItemSum"
@@ -142,9 +147,11 @@
                     android:text="3 pc"
                     android:textColor="@color/primaryColor"
                     android:textSize="13sp"
+                    android:visibility="@{item.counter != null ? View.VISIBLE : View.GONE}"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toEndOf="parent"
-                    bind:layout_constraintTop_toTopOf="parent" />
+                    bind:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
