@@ -14,9 +14,9 @@ open class PostIncCountersUseCase @Inject constructor(
     private val countersRepository: ICountersRepository,
     threadExecutor: APIThreadExecutor,
     postExecutionThread: APIPostExecutionThread
-) : FlowableUseCase<List<CounterData>, CounterData?>(threadExecutor, postExecutionThread) {
+) : FlowableUseCase<List<CounterData?>, CounterData?>(threadExecutor, postExecutionThread) {
 
-    override fun buildUseCaseObservable(params: CounterData?): Flowable<List<CounterData>> =
+    override fun buildUseCaseObservable(params: CounterData?): Flowable<List<CounterData?>> =
         countersRepository.postIncCounter(params!!)
 
 }

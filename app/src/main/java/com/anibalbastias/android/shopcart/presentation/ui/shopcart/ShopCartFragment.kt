@@ -74,7 +74,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     private fun showLoadingView() {
-        shopCartViewModel.isLoading.set(true)
+        //shopCartViewModel.isLoading.set(true)
     }
 
     private fun fetchProducts() {
@@ -88,7 +88,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
 
             // Set Swipe Refresh Layout
             binding.shopCartListSwipeRefreshLayout?.initSwipe {
-                fetchAllProducts()
+                fetchAllProducts(showLoading = false)
             }
         }
     }

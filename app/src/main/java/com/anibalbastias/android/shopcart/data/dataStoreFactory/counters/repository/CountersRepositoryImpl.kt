@@ -15,18 +15,18 @@ import javax.inject.Singleton
 class CountersRepositoryImpl @Inject constructor(private val shopCartApiService: ShopCartApiService) :
     ICountersRepository {
 
-    override fun getCounters(): Flowable<List<CounterData>> =
+    override fun getCounters(): Flowable<List<CounterData?>> =
         shopCartApiService.getCounters()
 
-    override fun postCounter(request: CounterData): Flowable<List<CounterData>> =
+    override fun postCounter(request: CounterData): Flowable<List<CounterData?>> =
         shopCartApiService.postCounter(request)
 
-    override fun postIncCounter(request: CounterData): Flowable<List<CounterData>> =
+    override fun postIncCounter(request: CounterData): Flowable<List<CounterData?>> =
         shopCartApiService.postIncCounter(request)
 
-    override fun postDecCounter(request: CounterData): Flowable<List<CounterData>> =
+    override fun postDecCounter(request: CounterData): Flowable<List<CounterData?>> =
         shopCartApiService.postDecCounter(request)
 
-    override fun deleteCounter(request: CounterData): Flowable<List<CounterData>> =
+    override fun deleteCounter(request: CounterData): Flowable<List<CounterData?>> =
         shopCartApiService.deleteCounter(request)
 }

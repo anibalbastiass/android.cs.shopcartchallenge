@@ -12,7 +12,7 @@ import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
 import com.anibalbastias.android.shopcart.presentation.context
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterViewDataMapper
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
@@ -27,13 +27,18 @@ class ShopCartViewModel @Inject constructor(
     private val postDecCountersUseCase: PostDecCountersUseCase,
     private val deleteCountersUseCase: DeleteCountersUseCase,
     private val productsViewDataMapper: ProductsViewDataMapper,
-    private val counterViewDataMapper: CounterViewDataMapper
+    private val counterListViewDataMapper: CounterListViewDataMapper
 ) : BaseViewModel() {
 
     // region Observables
     var isLoading: ObservableBoolean = ObservableBoolean(false)
     var isError: ObservableBoolean = ObservableBoolean(false)
+    var shopCartList: ObservableField<ArrayList<ProductsItemViewData?>> =
+        ObservableField(arrayListOf())
+    var shopCartTotalCount: ObservableInt = ObservableInt(0)
     // endregion
+
+    var shopCartItemLayout: Int = R.layout.view_cell_shop_cart_item
 
     override fun onCleared() {
         getProductsUseCase.dispose()
@@ -45,14 +50,18 @@ class ShopCartViewModel @Inject constructor(
         super.onCleared()
     }
 
-    var shopCartItemLayout: Int = R.layout.view_cell_shop_cart_item
-    var shopCartList: ObservableField<ArrayList<ProductsItemViewData?>> =
-        ObservableField(
-            arrayListOf()
-        )
+    //region Live Data
+    private val getProductsLiveData: MutableLiveData<Resource<ProductsViewData>> = MutableLiveData()
 
-    var shopCartTotalCount: ObservableInt = ObservableInt(0)
+    fun getProductsLiveData() = getProductsLiveData
 
+    private val getCountersLiveData: MutableLiveData<Resource<List<CounterViewData?>>> =
+        MutableLiveData()
+
+    fun getCountersLiveData() = getCountersLiveData
+    //endregion
+
+    //region Counters local methods
     private fun updateShopCartTotalCount() {
         var total = 0
         shopCartList.get()?.map {
@@ -61,12 +70,7 @@ class ShopCartViewModel @Inject constructor(
         shopCartTotalCount.set(total)
     }
 
-    private val getProductsLiveData: MutableLiveData<Resource<ProductsViewData>> =
-        MutableLiveData()
-
-    fun getProductsLiveData() = getProductsLiveData
-
-    fun ProductsItemViewData.mapCounterProduct(counterBlock: (ProductsItemViewData?) -> Unit) {
+    private fun ProductsItemViewData.mapCounterProduct(counterBlock: (ProductsItemViewData?) -> Unit) {
         shopCartList.get()?.map {
             if (it?.itemId == itemId) {
                 counterBlock.invoke(it)
@@ -98,10 +102,12 @@ class ShopCartViewModel @Inject constructor(
             it?.counter?.set(CounterViewData(count = 0))
         }
     }
+    //endregion
 
-    fun fetchAllProducts() {
+    //region API Calls
+    fun fetchAllProducts(showLoading: Boolean? = true) {
 
-        isLoading.set(true)
+        isLoading.set(showLoading!!)
         getProductsLiveData.postValue(Resource(ResourceState.LOADING, null, null))
 
         return getProductsUseCase.execute(
@@ -111,4 +117,16 @@ class ShopCartViewModel @Inject constructor(
             )
         )
     }
+
+    fun fetchAllCounters() {
+        getCountersLiveData.postValue(Resource(ResourceState.LOADING, null, null))
+
+        return getCountersUseCase.execute(
+            BaseSubscriber(
+                context?.applicationContext, this, counterListViewDataMapper,
+                getCountersLiveData, isLoading, isError
+            )
+        )
+    }
+    //endregion
 }

@@ -24,18 +24,18 @@ interface ShopCartApiService {
 
     //region Counters
     @GET(GET_COUNTERS)
-    fun getCounters(): Flowable<List<CounterData>>
+    fun getCounters(): Flowable<List<CounterData?>>
 
     @POST(POST_COUNTER)
-    fun postCounter(@Body request: CounterData): Flowable<List<CounterData>>
+    fun postCounter(@Body request: CounterData): Flowable<List<CounterData?>>
 
     @POST(POST_COUNTER_INC)
-    fun postIncCounter(@Body request: CounterData): Flowable<List<CounterData>>
+    fun postIncCounter(@Body request: CounterData): Flowable<List<CounterData?>>
 
     @POST(POST_COUNTER_DEC)
-    fun postDecCounter(@Body request: CounterData): Flowable<List<CounterData>>
+    fun postDecCounter(@Body request: CounterData): Flowable<List<CounterData?>>
 
     @DELETE(DELETE_COUNTER)
-    fun deleteCounter(@Body request: CounterData): Flowable<List<CounterData>>
+    fun deleteCounter(@Body request: CounterData): Flowable<List<CounterData?>>
     //endregion
 }

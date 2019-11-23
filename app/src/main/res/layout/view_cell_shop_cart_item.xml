@@ -33,7 +33,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="5dp">
 
             <ImageView
                 android:id="@+id/shopCartItemImageView"
@@ -61,11 +61,27 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/opensans_semibold"
                     android:text="@{item.title}"
-                    bind:layout_constraintBottom_toTopOf="@+id/shopCartItemSubtitle"
+                    android:textColor="@color/primaryColor"
+                    android:textSize="14dp"
+                    android:layout_marginTop="10dp"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintStart_toStartOf="parent"
                     bind:layout_constraintTop_toTopOf="parent"
                     tools:text="Title" />
+
+                <TextView
+                    android:id="@+id/shopCartItemPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/opensans_regular"
+                    android:text="@{item.productAmountData.currency +` `+item.productAmountData.value}"
+                    android:textColor="@color/grey"
+                    android:textSize="12dp"
+                    bind:layout_constraintBottom_toTopOf="@+id/shopCartItemSubtitle"
+                    bind:layout_constraintEnd_toEndOf="parent"
+                    bind:layout_constraintStart_toStartOf="parent"
+                    bind:layout_constraintTop_toBottomOf="@+id/shopCartItemTitle"
+                    tools:text="Subtitle" />
 
                 <TextView
                     android:id="@+id/shopCartItemSubtitle"
@@ -73,17 +89,18 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/opensans_regular"
                     android:text="@{item.subtitle}"
+                    android:textSize="11dp"
+                    android:layout_marginBottom="10dp"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintStart_toStartOf="parent"
-                    bind:layout_constraintTop_toBottomOf="@+id/shopCartItemTitle"
                     tools:text="Subtitle" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/shopCartItemCounters"
-                android:layout_width="0dp"
+                android:layout_width="110dp"
                 android:layout_height="100dp"
                 bind:layout_constraintBottom_toBottomOf="parent"
                 bind:layout_constraintEnd_toEndOf="parent"
@@ -93,7 +110,7 @@
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/shopCartItemAddButton"
                     android:layout_width="100dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:maxLines="1"
                     android:onClick="@{() -> clickHandler.onAddCounterItem(item)}"
                     android:text="ADD TO CART"
