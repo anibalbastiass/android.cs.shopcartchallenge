@@ -15,7 +15,7 @@ import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUse
 import com.anibalbastias.android.shopcart.presentation.context
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionData
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
@@ -120,7 +120,7 @@ class ShopCartViewModel @Inject constructor(
             it?.counter?.set(CounterViewData(count = 1))
 
             processCounter(
-                counterAction = CounterActionData.CREATE,
+                counterActionView = CounterActionViewData.CREATE,
                 request = CounterData(title = it?.itemId),
                 liveData = postCreateCounterLiveData
             )
@@ -133,7 +133,7 @@ class ShopCartViewModel @Inject constructor(
                 updateTempCounter(item, 1)
 
                 processCounter(
-                    counterAction = CounterActionData.INC,
+                    counterActionView = CounterActionViewData.INC,
                     request = CounterData(id = id),
                     liveData = postIncCounterLiveData
                 )
@@ -147,7 +147,7 @@ class ShopCartViewModel @Inject constructor(
                 updateTempCounter(item, -1)
 
                 processCounter(
-                    counterAction = CounterActionData.DEC,
+                    counterActionView = CounterActionViewData.DEC,
                     request = CounterData(id = id),
                     liveData = postDecCounterLiveData
                 )
@@ -161,7 +161,7 @@ class ShopCartViewModel @Inject constructor(
                 updateTempCounter(item)
 
                 processCounter(
-                    counterAction = CounterActionData.DELETE,
+                    counterActionView = CounterActionViewData.DELETE,
                     request = CounterData(id = id),
                     liveData = deleteCounterLiveData
                 )
@@ -170,7 +170,7 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun setAndMapCounters(
-        counterAction: CounterActionData? = null,
+        counterActionView: CounterActionViewData? = null,
         counterList: List<CounterViewData?>
     ) {
         val productList = shopCartList.get()
@@ -184,8 +184,8 @@ class ShopCartViewModel @Inject constructor(
                     productItem?.isUpdating = false
 
                     // If create a counter, then increment counter to 1
-                    when (counterAction) {
-                        CounterActionData.CREATE -> {
+                    when (counterActionView) {
+                        CounterActionViewData.CREATE -> {
                             // Create item and then Increment value
                             if (counterItem?.count == 0) {
                                 // Fix initial value when create
@@ -193,7 +193,7 @@ class ShopCartViewModel @Inject constructor(
                                     counterItem.count = 1
 
                                     processCounter(
-                                        counterAction = CounterActionData.INC,
+                                        counterActionView = CounterActionViewData.INC,
                                         request = CounterData(id = counterItem?.id),
                                         liveData = postIncCounterLiveData
                                     )
@@ -222,16 +222,16 @@ class ShopCartViewModel @Inject constructor(
     private fun processCounter(
         liveData: MutableLiveData<Resource<List<CounterViewData?>>>,
         request: CounterData? = null,
-        counterAction: CounterActionData
+        counterActionView: CounterActionViewData
     ) {
 
         liveData.postValue(Resource(ResourceState.LOADING, null, null))
 
-        val useCase = when (counterAction) {
-            CounterActionData.CREATE -> postCountersUseCase
-            CounterActionData.INC -> postIncCountersUseCase
-            CounterActionData.DEC -> postDecCountersUseCase
-            CounterActionData.DELETE -> deleteCountersUseCase
+        val useCase = when (counterActionView) {
+            CounterActionViewData.CREATE -> postCountersUseCase
+            CounterActionViewData.INC -> postIncCountersUseCase
+            CounterActionViewData.DEC -> postDecCountersUseCase
+            CounterActionViewData.DELETE -> deleteCountersUseCase
         }
 
         return useCase.execute(

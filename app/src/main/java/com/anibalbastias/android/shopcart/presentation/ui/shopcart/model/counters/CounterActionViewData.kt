@@ -1,6 +1,6 @@
 package com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters
 
-enum class CounterActionData {
+enum class CounterActionViewData {
     CREATE,
     INC,
     DEC,

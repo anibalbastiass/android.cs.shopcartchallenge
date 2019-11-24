@@ -12,7 +12,7 @@ import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBindin
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionData
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
@@ -71,7 +71,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getPostCreateCounterLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.CREATE,
+                    CounterActionViewData.CREATE,
                     viewData
                 )
             },
@@ -82,7 +82,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getPostIncCountersLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.INC,
+                    CounterActionViewData.INC,
                     viewData
                 )
             },
@@ -93,7 +93,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getPostDecCountersLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.DEC,
+                    CounterActionViewData.DEC,
                     viewData
                 )
             },
@@ -104,7 +104,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getDeleteCounterLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.DELETE,
+                    CounterActionViewData.DELETE,
                     viewData
                 )
             },
@@ -113,10 +113,10 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     private fun getCountersData(
-        counterAction: CounterActionData? = null,
+        counterActionView: CounterActionViewData? = null,
         viewData: List<CounterViewData?>
     ) {
-        shopCartViewModel.setAndMapCounters(counterAction, viewData)
+        shopCartViewModel.setAndMapCounters(counterActionView, viewData)
     }
 
     private fun getProductsData(viewData: ProductsViewData) {
