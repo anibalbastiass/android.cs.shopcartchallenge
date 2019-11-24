@@ -8,11 +8,8 @@ import com.anibalbastias.android.shopcart.presentation.util.adapter.base.BaseBin
  */
 
 interface ShopCartItemListener<T> : BaseBindClickHandler<T> {
-
     override fun onClickView(view: View, item: T) { }
     fun onAddCounterItem(item: T)
     fun onIncCounterItem(item: T)
     fun onDecCounterItem(item: T)
-    fun onDeleteCounterItem(item: T)
-
 }

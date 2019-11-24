@@ -62,7 +62,8 @@
                     android:text="@{``+ shopCartViewModel.shopCartTotalCount}"
                     android:textColor="@color/white"
                     android:textSize="10sp"
-                    android:visibility="@{shopCartViewModel.shopCartTotalCount > 0 ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{shopCartViewModel.shopCartTotalCount > 0 ? View.VISIBLE : View.GONE}"
+                    tools:text="1" />
 
             </RelativeLayout>
 
@@ -99,6 +100,7 @@
                 android:layout_height="0dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
+                android:paddingBottom="8dp"
                 android:scrollbars="vertical"
                 android:visibility="visible"
                 bind:loadAdapterData="@{shopCartViewModel.shopCartList}"

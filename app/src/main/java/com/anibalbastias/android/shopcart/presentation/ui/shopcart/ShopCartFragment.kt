@@ -12,6 +12,8 @@ import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBindin
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionData
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
@@ -53,20 +55,83 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     private fun initViewModel() {
+        // Fetch Products
         implementObserver(shopCartViewModel.getProductsLiveData(),
             successBlock = { viewData -> getProductsData(viewData) },
             loadingBlock = { showLoadingView() },
             errorBlock = { showErrorView(it) })
+
+        // Fetch Counters
+        implementObserver(shopCartViewModel.getCountersLiveData(),
+            successBlock = { viewData -> getCountersData(viewData = viewData) },
+            loadingBlock = { showLoadingView() },
+            errorBlock = { showErrorView(it) })
+
+        // Post Create counter
+        implementObserver(shopCartViewModel.getPostCreateCounterLiveData(),
+            successBlock = { viewData ->
+                getCountersData(
+                    CounterActionData.CREATE,
+                    viewData
+                )
+            },
+            loadingBlock = { showLoadingView() },
+            errorBlock = { showErrorView(it) })
+
+        // Post Inc counter by id
+        implementObserver(shopCartViewModel.getPostIncCountersLiveData(),
+            successBlock = { viewData ->
+                getCountersData(
+                    CounterActionData.INC,
+                    viewData
+                )
+            },
+            loadingBlock = { showLoadingView() },
+            errorBlock = { showErrorView(it) })
+
+        // Post Dec counter by id
+        implementObserver(shopCartViewModel.getPostDecCountersLiveData(),
+            successBlock = { viewData ->
+                getCountersData(
+                    CounterActionData.DEC,
+                    viewData
+                )
+            },
+            loadingBlock = { showLoadingView() },
+            errorBlock = { showErrorView(it) })
+
+        // Delete counter by id
+        implementObserver(shopCartViewModel.getDeleteCounterLiveData(),
+            successBlock = { viewData ->
+                getCountersData(
+                    CounterActionData.DELETE,
+                    viewData
+                )
+            },
+            loadingBlock = { showLoadingView() },
+            errorBlock = { showErrorView(it) })
+    }
+
+    private fun getCountersData(
+        counterAction: CounterActionData? = null,
+        viewData: List<CounterViewData?>
+    ) {
+        shopCartViewModel.setAndMapCounters(counterAction, viewData)
     }
 
     private fun getProductsData(viewData: ProductsViewData) {
-        shopCartViewModel.isLoading.set(false)
-        shopCartViewModel.isError.set(false)
-        binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
+        shopCartViewModel.apply {
+            isLoading.set(false)
+            isError.set(false)
+            binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
 
-        shopCartViewModel.shopCartList.set(
-            viewData.products as? ArrayList<ProductsItemViewData?>
-        )
+            shopCartList.set(
+                viewData.products as? ArrayList<ProductsItemViewData?>
+            )
+
+            // Get Counters for Shop Cart
+            fetchAllCounters()
+        }
     }
 
     private fun showErrorView(errorMessage: String?) {
@@ -109,10 +174,9 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     override fun onDecCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.onDecCounterItem(item)
-    }
-
-    override fun onDeleteCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.onDeleteCounterItem(item)
+        if (item.counter?.get()?.count!! > 1)
+            shopCartViewModel.onDecCounterItem(item)
+        else
+            shopCartViewModel.onDeleteCounterItem(item)
     }
 }

@@ -35,7 +35,7 @@ interface ShopCartApiService {
     @POST(POST_COUNTER_DEC)
     fun postDecCounter(@Body request: CounterData): Flowable<List<CounterData?>>
 
-    @DELETE(DELETE_COUNTER)
+    @HTTP(method = "DELETE", path = DELETE_COUNTER, hasBody = true)
     fun deleteCounter(@Body request: CounterData): Flowable<List<CounterData?>>
     //endregion
 }

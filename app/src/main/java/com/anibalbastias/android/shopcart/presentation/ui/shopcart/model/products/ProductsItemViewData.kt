@@ -12,5 +12,6 @@ data class ProductsItemViewData(
     val subtitle: String? = null,
     val imageUrl: String? = null,
     val title: String? = null,
-    var counter: ObservableField<CounterViewData>? = ObservableField(CounterViewData(count = 0))
+    var counter: ObservableField<CounterViewData>? = ObservableField(CounterViewData(count = 0)),
+    var isUpdating: Boolean? = false
 ) : Parcelable

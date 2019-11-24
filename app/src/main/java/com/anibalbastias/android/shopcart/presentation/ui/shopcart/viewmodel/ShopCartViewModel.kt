@@ -9,11 +9,13 @@ import com.anibalbastias.android.shopcart.base.subscriber.BaseSubscriber
 import com.anibalbastias.android.shopcart.base.view.BaseViewModel
 import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
+import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.CounterData
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
 import com.anibalbastias.android.shopcart.presentation.context
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
@@ -59,13 +61,35 @@ class ShopCartViewModel @Inject constructor(
         MutableLiveData()
 
     fun getCountersLiveData() = getCountersLiveData
+
+    private val postCreateCounterLiveData: MutableLiveData<Resource<List<CounterViewData?>>> =
+        MutableLiveData()
+
+    fun getPostCreateCounterLiveData() = postCreateCounterLiveData
+
+    private val postIncCounterLiveData: MutableLiveData<Resource<List<CounterViewData?>>> =
+        MutableLiveData()
+
+    fun getPostIncCountersLiveData() = postIncCounterLiveData
+
+    private val postDecCounterLiveData: MutableLiveData<Resource<List<CounterViewData?>>> =
+        MutableLiveData()
+
+    fun getPostDecCountersLiveData() = postDecCounterLiveData
+
+    private val deleteCounterLiveData: MutableLiveData<Resource<List<CounterViewData?>>> =
+        MutableLiveData()
+
+    fun getDeleteCounterLiveData() = deleteCounterLiveData
     //endregion
 
     //region Counters local methods
     private fun updateShopCartTotalCount() {
         var total = 0
         shopCartList.get()?.map {
-            total += it?.counter?.get()?.count!!
+            it?.counter?.get()?.count?.let { count ->
+                total += count
+            }
         }
         shopCartTotalCount.set(total)
     }
@@ -73,58 +97,159 @@ class ShopCartViewModel @Inject constructor(
     private fun ProductsItemViewData.mapCounterProduct(counterBlock: (ProductsItemViewData?) -> Unit) {
         shopCartList.get()?.map {
             if (it?.itemId == itemId) {
+                it?.isUpdating = true
                 counterBlock.invoke(it)
             }
         }
         updateShopCartTotalCount()
     }
 
+    private fun updateTempCounter(item: ProductsItemViewData, newValue: Int? = null) {
+        val tempCounter = item.counter?.get()!!
+        item.counter?.set(
+            CounterViewData(
+                id = tempCounter.id,
+                title = tempCounter.title,
+                count = newValue?.let { tempCounter.count!! + it } ?: 0
+            )
+        )
+    }
+
     fun addCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
             it?.counter?.set(CounterViewData(count = 1))
+
+            processCounter(
+                counterAction = CounterActionData.CREATE,
+                request = CounterData(title = it?.itemId),
+                liveData = postCreateCounterLiveData
+            )
         }
     }
 
     fun onIncCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
-            item.counter?.set(CounterViewData(count = item.counter?.get()?.count!! + 1))
+            item.counter?.get()?.id?.let { id ->
+                updateTempCounter(item, 1)
+
+                processCounter(
+                    counterAction = CounterActionData.INC,
+                    request = CounterData(id = id),
+                    liveData = postIncCounterLiveData
+                )
+            }
         }
     }
 
     fun onDecCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
-            item.counter?.set(CounterViewData(count = item.counter?.get()?.count!! - 1))
+            item.counter?.get()?.id?.let { id ->
+                updateTempCounter(item, -1)
+
+                processCounter(
+                    counterAction = CounterActionData.DEC,
+                    request = CounterData(id = id),
+                    liveData = postDecCounterLiveData
+                )
+            }
         }
     }
 
     fun onDeleteCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
-            it?.counter?.set(CounterViewData(count = 0))
+            item.counter?.get()?.id?.let { id ->
+                updateTempCounter(item)
+
+                processCounter(
+                    counterAction = CounterActionData.DELETE,
+                    request = CounterData(id = id),
+                    liveData = deleteCounterLiveData
+                )
+            }
+        }
+    }
+
+    fun setAndMapCounters(
+        counterAction: CounterActionData? = null,
+        counterList: List<CounterViewData?>
+    ) {
+        val productList = shopCartList.get()
+
+        // Map between products and counters for match
+        productList?.map { productItem ->
+            counterList.map { counterItem ->
+                if (productItem?.itemId == counterItem?.title) {
+                    // Match product with counter
+                    productItem?.counter?.set(counterItem)
+                    productItem?.isUpdating = false
+
+                    // If create a counter, then increment counter to 1
+                    when (counterAction) {
+                        CounterActionData.CREATE -> {
+                            // Create item and then Increment value
+                            if (counterItem?.count == 0) {
+                                // Fix initial value when create
+                                if (counterItem.count == 0) {
+                                    counterItem.count = 1
+
+                                    processCounter(
+                                        counterAction = CounterActionData.INC,
+                                        request = CounterData(id = counterItem?.id),
+                                        liveData = postIncCounterLiveData
+                                    )
+                                }
+                            }
+                        }
+                        else -> updateShopCartTotalCount()
+                    }
+                }
+            }
         }
     }
     //endregion
 
     //region API Calls
-    fun fetchAllProducts(showLoading: Boolean? = true) {
+    fun fetchAllCounters() {
+        getCountersLiveData.postValue(Resource(ResourceState.LOADING, null, null))
+        return getCountersUseCase.execute(
+            BaseSubscriber(
+                context?.applicationContext, this, counterListViewDataMapper,
+                getCountersLiveData, isLoading, isError
+            )
+        )
+    }
 
-        isLoading.set(showLoading!!)
+    private fun processCounter(
+        liveData: MutableLiveData<Resource<List<CounterViewData?>>>,
+        request: CounterData? = null,
+        counterAction: CounterActionData
+    ) {
+
+        liveData.postValue(Resource(ResourceState.LOADING, null, null))
+
+        val useCase = when (counterAction) {
+            CounterActionData.CREATE -> postCountersUseCase
+            CounterActionData.INC -> postIncCountersUseCase
+            CounterActionData.DEC -> postDecCountersUseCase
+            CounterActionData.DELETE -> deleteCountersUseCase
+        }
+
+        return useCase.execute(
+            BaseSubscriber(
+                context?.applicationContext, this, counterListViewDataMapper,
+                liveData, isLoading, isError
+            ), request
+        )
+    }
+
+    fun fetchAllProducts(showLoading: Boolean? = true) {
+        isLoading.set(showLoading == true)
         getProductsLiveData.postValue(Resource(ResourceState.LOADING, null, null))
 
         return getProductsUseCase.execute(
             BaseSubscriber(
                 context?.applicationContext, this, productsViewDataMapper,
                 getProductsLiveData, isLoading, isError
-            )
-        )
-    }
-
-    fun fetchAllCounters() {
-        getCountersLiveData.postValue(Resource(ResourceState.LOADING, null, null))
-
-        return getCountersUseCase.execute(
-            BaseSubscriber(
-                context?.applicationContext, this, counterListViewDataMapper,
-                getCountersLiveData, isLoading, isError
             )
         )
     }
