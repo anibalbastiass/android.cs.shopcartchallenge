@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -109,40 +108,6 @@ fun isPortrait(context: Context): Boolean = try {
     false
 }
 
-fun launchUrlInCustomTabBase(activity: Activity, url: String) {
-
-    try {
-        val chrome = arrayOf("com.android.chrome",
-            "com.chrome.beta",
-            "com.chrome.dev",
-            "com.google.android.apps.chrome")
-
-        var isChromeInstall = false
-        chrome.forEach {
-            try {
-                activity.packageManager.getPackageInfo(it, 0)
-                isChromeInstall = true
-                return@forEach
-            } catch (nameNotFoundException: PackageManager.NameNotFoundException) {
-            }
-        }
-        if (!isChromeInstall) {
-//            activity.launchUrlWebView(url)
-            return
-        }
-
-        val intentBuilder = CustomTabsIntent.Builder()
-        intentBuilder.setToolbarColor(ContextCompat.getColor(activity, R.color.primaryColor))
-        intentBuilder.setSecondaryToolbarColor(ContextCompat.getColor(activity, R.color.primaryColor))
-
-        val customTabsIntent = intentBuilder.build()
-        customTabsIntent.launchUrl(activity, Uri.parse(url))
-
-    } catch (exception: Exception) {
-        activity.toast(activity.getString(R.string.generic_error_message))
-    }
-}
-
 fun SwipeRefreshLayout.initSwipe(onSwipeUnit: (() -> Unit)?) {
     this.setColorSchemeColors(ContextCompat.getColor(context, R.color.primaryColor))
     this.setOnRefreshListener { onSwipeUnit?.invoke() }
@@ -162,7 +127,6 @@ fun <T> Fragment.implementObserver(mutableLiveData: MutableLiveData<Resource<T>>
 
     handleObserver(mutableLiveData, defaultBlock, successBlock, loadingBlock, errorBlock, codeBlock, hideLoadingBlock)
 }
-
 
 private fun <T> Fragment.handleObserver(mutableLiveData: MutableLiveData<Resource<T>>,
                                         defaultBlock: () -> Unit,
