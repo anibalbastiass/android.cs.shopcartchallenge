@@ -1,10 +1,7 @@
 package com.anibalbastias.android.shopcart.presentation.util
 
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import androidx.databinding.BindingAdapter
 import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.anibalbastias.android.shopcart.presentation.util.adapter.base.BaseBindClickHandler
 import com.anibalbastias.android.shopcart.presentation.util.adapter.base.SingleLayoutBindRecyclerAdapter

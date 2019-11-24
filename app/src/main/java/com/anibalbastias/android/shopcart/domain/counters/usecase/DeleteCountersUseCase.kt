@@ -14,9 +14,9 @@ open class DeleteCountersUseCase @Inject constructor(
     private val countersRepository: ICountersRepository,
     threadExecutor: APIThreadExecutor,
     postExecutionThread: APIPostExecutionThread
-) : FlowableUseCase<List<CounterData>, CounterData?>(threadExecutor, postExecutionThread) {
+) : FlowableUseCase<List<CounterData?>, CounterData?>(threadExecutor, postExecutionThread) {
 
-    override fun buildUseCaseObservable(params: CounterData?): Flowable<List<CounterData>> =
+    override fun buildUseCaseObservable(params: CounterData?): Flowable<List<CounterData?>> =
         countersRepository.deleteCounter(params!!)
 
 }
