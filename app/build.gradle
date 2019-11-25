@@ -45,6 +45,7 @@ android {
         }
     }
     lintOptions {
+        abortOnError false
         warning 'InvalidPackage'
     }
     packagingOptions {
