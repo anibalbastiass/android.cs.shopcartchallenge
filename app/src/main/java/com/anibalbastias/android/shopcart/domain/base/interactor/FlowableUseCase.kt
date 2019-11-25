@@ -1,4 +1,4 @@
-package au.com.carsales.apibaselib.domain.interactor
+package com.anibalbastias.android.shopcart.domain.base.interactor
 
 import com.anibalbastias.android.shopcart.domain.base.executor.APIPostExecutionThread
 import com.anibalbastias.android.shopcart.domain.base.executor.APIThreadExecutor

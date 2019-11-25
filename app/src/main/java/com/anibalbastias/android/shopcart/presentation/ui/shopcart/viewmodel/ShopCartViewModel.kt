@@ -260,29 +260,34 @@ class ShopCartViewModel @Inject constructor(
         )
     }
 
-    private fun processCounter(
+    fun processCounter(
         liveData: MutableLiveData<Resource<List<CounterViewData?>>>,
         request: CounterData? = null,
-        counterActionView: CounterActionViewData
+        counterActionView: CounterActionViewData,
+        isTest: Boolean? = false
     ) {
         if (hasConnectionLiveData.value == true) {
             liveData.postValue(Resource(ResourceState.LOADING, null, null))
 
             val useCase = when (counterActionView) {
                 CounterActionViewData.CREATE -> {
-                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
+                    if (!isTest!!)
+                        updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
                     postCountersUseCase
                 }
                 CounterActionViewData.INC -> {
-                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
+                    if (!isTest!!)
+                        updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
                     postIncCountersUseCase
                 }
                 CounterActionViewData.DEC -> {
-                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
+                    if (!isTest!!)
+                        updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
                     postDecCountersUseCase
                 }
                 CounterActionViewData.DELETE -> {
-                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
+                    if (!isTest!!)
+                        updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
                     deleteCountersUseCase
                 }
                 CounterActionViewData.DEFAULT -> TODO()
