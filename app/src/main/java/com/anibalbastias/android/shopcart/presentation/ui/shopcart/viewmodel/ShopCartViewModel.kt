@@ -372,7 +372,7 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun checkPendentTransactions() {
-        val dataList = RealmManager.createCounterListDao().loadAllAsync()
+        val dataList = RealmManager.createCounterListDao().loadAll()
         dataList.addChangeListener { counterList, _ ->
             // Update data
             counterList.map { counter ->
@@ -383,36 +383,7 @@ class ShopCartViewModel @Inject constructor(
 
                         if (diffCount > 0) {
                             for (i in 0..diffCount) {
-                                when (counter.action) {
-                                    CounterEntity.ACTION_COUNTER_CREATE -> {
-                                        processCounter(
-                                            counterActionView = CounterActionViewData.CREATE,
-                                            request = CounterData(title = requestItem.get()?.title),
-                                            liveData = postCreateCounterLiveData
-                                        )
-                                    }
-                                    CounterEntity.ACTION_COUNTER_INC -> {
-                                        processCounter(
-                                            counterActionView = CounterActionViewData.INC,
-                                            request = CounterData(id = counter.id),
-                                            liveData = postIncCounterLiveData
-                                        )
-                                    }
-                                    CounterEntity.ACTION_COUNTER_DEC -> {
-                                        processCounter(
-                                            counterActionView = CounterActionViewData.DEC,
-                                            request = CounterData(id = counter.id),
-                                            liveData = postDecCounterLiveData
-                                        )
-                                    }
-                                    CounterEntity.ACTION_COUNTER_DELETE -> {
-                                        processCounter(
-                                            counterActionView = CounterActionViewData.DELETE,
-                                            request = CounterData(id = counter.id),
-                                            liveData = deleteCounterLiveData
-                                        )
-                                    }
-                                }
+                                // TODO: Send pendent data
                             }
                         }
                     }
