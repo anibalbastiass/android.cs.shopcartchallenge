@@ -15,7 +15,7 @@ android {
         versionCode appShopCartVersionCode
         versionName appShopCartVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
+        multiDexEnabled true
         resValue "string", "shopcart_endpoint", "$globalShopCartDependencies.SHOPCART_BASE_ENDPOINT"
     }
     buildTypes {

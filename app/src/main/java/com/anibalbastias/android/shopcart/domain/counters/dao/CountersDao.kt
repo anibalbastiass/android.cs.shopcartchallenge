@@ -4,6 +4,7 @@ import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.RealmResults
+import java.lang.IllegalArgumentException
 
 
 /**
@@ -44,8 +45,14 @@ class CountersDao(realm: Realm?) {
         return mRealm.where(CounterEntity::class.java).equalTo("title", title).findFirst()!!
     }
 
-    fun remove(item: RealmObject?) {
-        mRealm.executeTransaction { item?.deleteFromRealm() }
+    fun remove(item: CounterEntity?) {
+        mRealm.executeTransaction {
+            try {
+                item?.deleteFromRealm()
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun removeAll() {

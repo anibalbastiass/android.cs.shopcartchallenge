@@ -415,9 +415,9 @@ class DotLoadingIndicatorView : View {
             0.toFloat(), 0.toFloat(), squareWidth.toFloat()
             , squareWidth.toFloat()
         )
-        canvas.drawRoundRect(r, cornerRadius, cornerRadius, backgroundPaint)
+        canvas.drawRoundRect(r, cornerRadius, cornerRadius, backgroundPaint!!)
         //border
-        canvas.drawRoundRect(r, cornerRadius, cornerRadius, backgroundBorderPaint)
+        canvas.drawRoundRect(r, cornerRadius, cornerRadius, backgroundBorderPaint!!)
     }
 
     private fun computePosition(anchorView: View, outParams: WindowManager.LayoutParams, inverse: Boolean) {

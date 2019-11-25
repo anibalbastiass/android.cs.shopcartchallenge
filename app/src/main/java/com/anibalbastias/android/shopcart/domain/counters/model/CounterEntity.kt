@@ -10,23 +10,20 @@ open class CounterEntity : RealmObject() {
     var id: String? = null
     var title: String? = null
     var count: Int? = null
-    var state: StateCounter? = StateCounter.DEFAULT
-    var action: ActionCounter? = null
-
-    enum class ActionCounter {
-        CREATE,
-        INC,
-        DELETE
-    }
-
-    enum class StateCounter {
-        DEFAULT,
-        PENDENT,
-        SENT,
-        ERROR
-    }
+    var state: String? = STATE_COUNTER_DEFAULT
+    var action: String? = null
 
     companion object {
+
+        const val STATE_COUNTER_DEFAULT = "defaultState"
+        const val STATE_COUNTER_PENDENT = "pendentState"
+        const val STATE_COUNTER_SENT = "sentState"
+        const val STATE_COUNTER_ERROR = "errorState"
+
+        const val ACTION_COUNTER_CREATE = "createAction"
+        const val ACTION_COUNTER_INC = "incAction"
+        const val ACTION_COUNTER_DEC = "decAction"
+        const val ACTION_COUNTER_DELETE = "deleteAction"
 
         fun equals(list1: List<CounterEntity>?, list2: List<CounterEntity>?): Boolean {
 

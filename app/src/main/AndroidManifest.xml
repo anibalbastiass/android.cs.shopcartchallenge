@@ -8,6 +8,7 @@
 
     <!--normal permissions-->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -28,12 +29,6 @@
         <meta-data
             android:name="com.anibalbastias.android.shopcart.presentation.ShopCartGlideModule"
             android:value="AppGlideModule" />
-
-        <receiver android:name=".presentation.service.connection.InternetCheckReceiver">
-            <intent-filter>
-                <action android:name="com.anibalbastias.android.shopcart.presentation.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
 
         <activity android:name="com.anibalbastias.android.shopcart.presentation.MainActivity">
             <intent-filter>

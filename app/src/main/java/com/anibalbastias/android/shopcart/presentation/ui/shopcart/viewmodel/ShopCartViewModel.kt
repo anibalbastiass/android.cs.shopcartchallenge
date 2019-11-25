@@ -25,6 +25,7 @@ import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counter
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
+import com.anibalbastias.android.shopcart.presentation.util.isConnectingToInternet
 import io.realm.RealmList
 import io.realm.RealmResults
 import javax.inject.Inject
@@ -179,6 +180,13 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
+    fun checkDecDeleteCounterItem(item: ProductsItemViewData) {
+        if (item.counter?.get()?.count!! > 1)
+            onDecCounterItem(item)
+        else
+            onDeleteCounterItem(item)
+    }
+
     fun setAndMapCounters(
         counterActionView: CounterActionViewData? = null,
         counterList: List<CounterViewData?>
@@ -246,22 +254,53 @@ class ShopCartViewModel @Inject constructor(
         request: CounterData? = null,
         counterActionView: CounterActionViewData
     ) {
+        if (context?.isConnectingToInternet() == true) {
+            liveData.postValue(Resource(ResourceState.LOADING, null, null))
 
-        liveData.postValue(Resource(ResourceState.LOADING, null, null))
+            val useCase = when (counterActionView) {
+                CounterActionViewData.CREATE -> {
+                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
+                    postCountersUseCase
+                }
+                CounterActionViewData.INC -> {
+                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
+                    postIncCountersUseCase
+                }
+                CounterActionViewData.DEC -> {
+                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
+                    postDecCountersUseCase
+                }
+                CounterActionViewData.DELETE -> {
+                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
+                    deleteCountersUseCase
+                }
+                CounterActionViewData.DEFAULT -> TODO()
+            }
 
-        val useCase = when (counterActionView) {
-            CounterActionViewData.CREATE -> postCountersUseCase
-            CounterActionViewData.INC -> postIncCountersUseCase
-            CounterActionViewData.DEC -> postDecCountersUseCase
-            CounterActionViewData.DELETE -> deleteCountersUseCase
+            return useCase.execute(
+                BaseSubscriber(
+                    context?.applicationContext, this, counterListViewDataMapper,
+                    liveData, isLoading, isError
+                ), request
+            )
+        } else {
+            // Create pendent counters into local database
+            when (counterActionView) {
+                CounterActionViewData.CREATE -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
+                }
+                CounterActionViewData.INC -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
+                }
+                CounterActionViewData.DEC -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
+                }
+                CounterActionViewData.DELETE -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
+                }
+                CounterActionViewData.DEFAULT -> TODO()
+            }
         }
-
-        return useCase.execute(
-            BaseSubscriber(
-                context?.applicationContext, this, counterListViewDataMapper,
-                liveData, isLoading, isError
-            ), request
-        )
     }
 
     fun fetchAllProducts(showLoading: Boolean? = true) {
@@ -285,19 +324,25 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
-    private fun getPendentCounter(action: CounterEntity.ActionCounter): CounterEntity {
+    private fun getCurrentCounter(action: String): CounterEntity {
         val reqItem = requestItem.get()?.counter?.get()!!
         val counter = CounterEntity()
         counter.id = reqItem.id
         counter.title = reqItem.title
         counter.count = reqItem.count
-        counter.state = CounterEntity.StateCounter.PENDENT
+        counter.state = CounterEntity.STATE_COUNTER_PENDENT
         counter.action = action
         return counter
     }
 
-    fun processPendentCounterAsync(action: CounterEntity.ActionCounter) {
-        RealmManager.createCounterListDao().save(getPendentCounter(action))
+    private fun processPendentCounterAsync(action: String) {
+        RealmManager.createCounterListDao().save(getCurrentCounter(action))
+    }
+
+    private fun deletePendentCounterAsync(action: String) {
+        if (getCurrentCounter(action).state == CounterEntity.STATE_COUNTER_PENDENT) {
+            RealmManager.createCounterListDao().remove(getCurrentCounter(action))
+        }
     }
 
     fun setOfflineProducts(list: RealmResults<ProductsEntity>?) {

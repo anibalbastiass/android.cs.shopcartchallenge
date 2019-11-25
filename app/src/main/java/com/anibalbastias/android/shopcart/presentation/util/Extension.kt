@@ -26,7 +26,7 @@ import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.presentation.GlideApp
-import com.anibalbastias.android.shopcart.presentation.service.connection.InternetCheckReceiver
+import com.anibalbastias.android.shopcart.presentation.context
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.util.*
 
@@ -197,32 +197,6 @@ fun RecyclerView.runLayoutAnimation() {
 }
 
 fun Context.isConnectingToInternet(): Boolean {
-    val connectivity = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-    if (connectivity != null) {
-        val info = connectivity.allNetworkInfo
-        info?.forEach { networkInfo ->
-            if (networkInfo.state == NetworkInfo.State.CONNECTED) {
-                return true
-            }
-        }
-    }
-    return false
-}
-
-fun Context.registerConnectionReceiver(callback: CheckInternetConnectionListener?) {
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        val receiver = InternetCheckReceiver()
-        receiver.callback = callback
-
-        val intentFilter = IntentFilter()
-        intentFilter.addAction("com.anibalbastias.android.shopcart.presentation.CONNECTIVITY_CHANGE")
-        registerReceiver(receiver, intentFilter)
-    } else {
-        callback?.onChangeInternetConnection(isConnectingToInternet())
-    }
-}
-
-interface CheckInternetConnectionListener {
-    fun onChangeInternetConnection(connected: Boolean)
+    val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    return cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnected
 }

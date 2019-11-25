@@ -9,7 +9,6 @@ import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.module.getViewModel
 import com.anibalbastias.android.shopcart.base.view.BaseModuleFragment
 import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBinding
-import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
@@ -20,13 +19,15 @@ import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counter
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
-import com.anibalbastias.android.shopcart.presentation.util.*
+import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarTitle
+import com.anibalbastias.android.shopcart.presentation.util.implementObserver
+import com.anibalbastias.android.shopcart.presentation.util.initSwipe
+import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
 import io.realm.RealmResults
 
 class ShopCartFragment : BaseModuleFragment(),
     ShopCartItemListener<ProductsItemViewData>,
-    GetOfflineProductsListener,
-    CheckInternetConnectionListener {
+    GetOfflineProductsListener {
 
     override fun tagName(): String = this::class.java.simpleName
     override fun layoutId(): Int = R.layout.fragment_shop_cart_list
@@ -40,7 +41,6 @@ class ShopCartFragment : BaseModuleFragment(),
         navBaseViewModel = getViewModel(viewModelFactory)
         sharedViewModel = activity!!.getViewModel(SavedStateViewModelFactory(getAppContext(), this))
         shopCartViewModel = getViewModel(viewModelFactory)
-        context?.registerConnectionReceiver(this)
         setHasOptionsMenu(true)
     }
 
@@ -81,7 +81,7 @@ class ShopCartFragment : BaseModuleFragment(),
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it, CounterActionViewData.CREATE) })
+            errorBlock = { showErrorView(it) })
 
         // Post Inc counter by id
         implementObserver(shopCartViewModel.getPostIncCountersLiveData(),
@@ -92,7 +92,7 @@ class ShopCartFragment : BaseModuleFragment(),
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it, CounterActionViewData.INC) })
+            errorBlock = { showErrorView(it) })
 
         // Post Dec counter by id
         implementObserver(shopCartViewModel.getPostDecCountersLiveData(),
@@ -103,7 +103,7 @@ class ShopCartFragment : BaseModuleFragment(),
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it, CounterActionViewData.DEC) })
+            errorBlock = { showErrorView(it) })
 
         // Delete counter by id
         implementObserver(shopCartViewModel.getDeleteCounterLiveData(),
@@ -114,7 +114,7 @@ class ShopCartFragment : BaseModuleFragment(),
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it, CounterActionViewData.DELETE) })
+            errorBlock = { showErrorView(it) })
     }
 
     private fun getCountersData(
@@ -139,33 +139,11 @@ class ShopCartFragment : BaseModuleFragment(),
         }
     }
 
-    private fun showErrorView(
-        errorMessage: String?,
-        counterActionView: CounterActionViewData? = null
-    ) {
+    private fun showErrorView(errorMessage: String?) {
         shopCartViewModel.apply {
-
             isLoading.set(false)
             binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
-            val callback = this@ShopCartFragment
-
-            when (counterActionView) {
-                CounterActionViewData.CREATE -> {
-                    processPendentCounterAsync(CounterEntity.ActionCounter.CREATE)
-                }
-                CounterActionViewData.INC -> {
-                    processPendentCounterAsync(CounterEntity.ActionCounter.INC)
-                }
-                CounterActionViewData.DEC -> {
-                    processPendentCounterAsync(CounterEntity.ActionCounter.DELETE)
-                }
-                CounterActionViewData.DELETE -> {
-                    processPendentCounterAsync(CounterEntity.ActionCounter.DELETE)
-                }
-                else -> {
-                    loadProductsListAsync(callback)
-                }
-            }
+            loadProductsListAsync(this@ShopCartFragment)
         }
     }
 
@@ -213,20 +191,11 @@ class ShopCartFragment : BaseModuleFragment(),
     override fun onDecCounterItem(item: ProductsItemViewData) {
         shopCartViewModel.run {
             requestItem.set(item)
-
-            if (item.counter?.get()?.count!! > 1)
-                onDecCounterItem(item)
-            else
-                onDeleteCounterItem(item)
+            checkDecDeleteCounterItem(item)
         }
     }
 
     override fun onGetProductsFromRealm(list: RealmResults<ProductsEntity>?) {
         shopCartViewModel.setOfflineProducts(list)
-    }
-
-    override fun onChangeInternetConnection(connected: Boolean) {
-        // Process pendent counter transactions
-
     }
 }
