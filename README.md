@@ -39,6 +39,9 @@ Save and get local database for keep persistence if the device lost internet con
 - Unit Testing
 Implement test for ViewModel throw captors, mocks for check stats for LiveData too.
 
+- Continuous Integration
+With Github Actions feature (Top tab), this repository is processing throw CI.
+
 ## Screenshot
 
 ![Shop Cart App](https://raw.githubusercontent.com/anibalbastiass/android.cs.shopcartchallenge/develop/screenshots/photo1.png)
