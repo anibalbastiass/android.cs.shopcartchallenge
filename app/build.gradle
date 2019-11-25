@@ -95,6 +95,7 @@ dependencies {
     // Stetho Debugger
     implementation presentationDependencies.stetho
     implementation presentationDependencies.stethoRealm
+    implementation presentationDependencies.internetAvaibility
 
     // Glide
     api presentationDependencies.glide

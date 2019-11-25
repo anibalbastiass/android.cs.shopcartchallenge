@@ -1,6 +1,5 @@
 package com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel
 
-import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
@@ -14,8 +13,8 @@ import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.C
 import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
 import com.anibalbastias.android.shopcart.domain.db.RealmManager
-import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
 import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
+import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
 import com.anibalbastias.android.shopcart.presentation.context
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
@@ -25,10 +24,10 @@ import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counter
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
-import com.anibalbastias.android.shopcart.presentation.util.isConnectingToInternet
 import io.realm.RealmList
 import io.realm.RealmResults
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 /**
  * Created by anibalbastias on 2019-11-25.
@@ -68,6 +67,8 @@ class ShopCartViewModel @Inject constructor(
     }
 
     //region Live Data
+    var hasConnectionLiveData: MutableLiveData<Boolean> = MutableLiveData()
+
     private val getProductsLiveData: MutableLiveData<Resource<ProductsViewData>> = MutableLiveData()
 
     fun getProductsLiveData() = getProductsLiveData
@@ -134,7 +135,7 @@ class ShopCartViewModel @Inject constructor(
         requestItem.set(item)
 
         item.mapCounterProduct {
-            it?.counter?.set(CounterViewData(count = 1))
+            it?.counter?.set(CounterViewData(id = item.counter?.get()?.title, count = 1))
 
             processCounter(
                 counterActionView = CounterActionViewData.CREATE,
@@ -160,7 +161,7 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
-    fun onDecCounterItem(item: ProductsItemViewData) {
+    private fun onDecCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
             item.counter?.get()?.id?.let { id ->
                 updateTempCounter(item, -1)
@@ -174,7 +175,7 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteCounterItem(item: ProductsItemViewData) {
+    private fun onDeleteCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
             item.counter?.get()?.id?.let { id ->
                 updateTempCounter(item)
@@ -264,24 +265,24 @@ class ShopCartViewModel @Inject constructor(
         request: CounterData? = null,
         counterActionView: CounterActionViewData
     ) {
-        if (context?.isConnectingToInternet() == true) {
+        if (hasConnectionLiveData.value == true) {
             liveData.postValue(Resource(ResourceState.LOADING, null, null))
 
             val useCase = when (counterActionView) {
                 CounterActionViewData.CREATE -> {
-                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
                     postCountersUseCase
                 }
                 CounterActionViewData.INC -> {
-                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
                     postIncCountersUseCase
                 }
                 CounterActionViewData.DEC -> {
-                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
                     postDecCountersUseCase
                 }
                 CounterActionViewData.DELETE -> {
-                    deletePendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
                     deleteCountersUseCase
                 }
                 CounterActionViewData.DEFAULT -> TODO()
@@ -350,9 +351,10 @@ class ShopCartViewModel @Inject constructor(
         RealmManager.createCounterListDao().save(getCurrentCounter(action))
     }
 
-    private fun deletePendentCounterAsync(action: String) {
+    private fun updatePendentCounterAsync(action: String) {
         if (getCurrentCounter(action).state == CounterEntity.STATE_COUNTER_PENDENT) {
-            RealmManager.createCounterListDao().remove(getCurrentCounter(action))
+            getCurrentCounter(action).state = CounterEntity.STATE_COUNTER_SENT
+            RealmManager.createCounterListDao().save(getCurrentCounter(action))
         }
     }
 
@@ -369,5 +371,54 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
+    fun checkPendentTransactions() {
+        val dataList = RealmManager.createCounterListDao().loadAllAsync()
+        dataList.addChangeListener { counterList, _ ->
+            // Update data
+            counterList.map { counter ->
+                if (counter.state == CounterEntity.STATE_COUNTER_PENDENT) {
+                    if (counter.id == requestItem.get()?.counter?.get()?.id) {
+                        val diffCount = (counter.count ?: 0
+                        - requestItem.get()?.counter?.get()?.count!!).absoluteValue
+
+                        if (diffCount > 0) {
+                            for (i in 0..diffCount) {
+                                when (counter.action) {
+                                    CounterEntity.ACTION_COUNTER_CREATE -> {
+                                        processCounter(
+                                            counterActionView = CounterActionViewData.CREATE,
+                                            request = CounterData(title = requestItem.get()?.title),
+                                            liveData = postCreateCounterLiveData
+                                        )
+                                    }
+                                    CounterEntity.ACTION_COUNTER_INC -> {
+                                        processCounter(
+                                            counterActionView = CounterActionViewData.INC,
+                                            request = CounterData(id = counter.id),
+                                            liveData = postIncCounterLiveData
+                                        )
+                                    }
+                                    CounterEntity.ACTION_COUNTER_DEC -> {
+                                        processCounter(
+                                            counterActionView = CounterActionViewData.DEC,
+                                            request = CounterData(id = counter.id),
+                                            liveData = postDecCounterLiveData
+                                        )
+                                    }
+                                    CounterEntity.ACTION_COUNTER_DELETE -> {
+                                        processCounter(
+                                            counterActionView = CounterActionViewData.DELETE,
+                                            request = CounterData(id = counter.id),
+                                            liveData = deleteCounterLiveData
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     //endregion
 }

@@ -1,6 +1,7 @@
 package com.anibalbastias.android.shopcart.domain.db
 
 import com.anibalbastias.android.shopcart.domain.counters.dao.CountersDao
+import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import com.anibalbastias.android.shopcart.domain.products.dao.ProductsDao
 import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
 import io.realm.Realm
@@ -40,7 +41,7 @@ object RealmManager {
         checkForOpenRealm()
         mRealm?.executeTransaction { realm ->
             realm.delete<ProductsItemEntity>()
-            //clear rest of your dao classes
+            realm.delete<CounterEntity>()
         }
     }
 

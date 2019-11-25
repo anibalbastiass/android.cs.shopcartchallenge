@@ -3,11 +3,7 @@ package com.anibalbastias.android.shopcart.presentation.util
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.IntentFilter
 import android.content.res.Configuration
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.os.Build
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -26,18 +22,8 @@ import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.presentation.GlideApp
-import com.anibalbastias.android.shopcart.presentation.context
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.util.*
-
-fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-    observeForever(object : Observer<T> {
-        override fun onChanged(t: T?) {
-            observer.onChanged(t)
-            removeObserver(this)
-        }
-    })
-}
 
 fun <T> LiveData<T>.initObserver(lifecycleOwner: LifecycleOwner, observer: (T?) -> Unit) {
     try {
@@ -194,9 +180,4 @@ fun RecyclerView.runLayoutAnimation() {
     layoutAnimation = AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down)
     adapter?.notifyDataSetChanged()
     scheduleLayoutAnimation()
-}
-
-fun Context.isConnectingToInternet(): Boolean {
-    val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    return cm.activeNetworkInfo != null && cm.activeNetworkInfo.isConnected
 }
