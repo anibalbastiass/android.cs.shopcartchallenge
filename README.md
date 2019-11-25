@@ -33,7 +33,7 @@ This component is useful for share and save data throw Live Data
 - Databinding and Observables:
 These are the ones in charge of refreshing data for UI throw Observable vars.
 
-- Room:
+- Realm (Room in a future):
 Save and get local database for keep persistence if the device lost internet connection and when this go back, send pendent data and sync these.
 
 

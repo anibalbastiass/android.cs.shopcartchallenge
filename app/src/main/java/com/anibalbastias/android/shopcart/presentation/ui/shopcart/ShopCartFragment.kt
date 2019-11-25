@@ -9,8 +9,10 @@ import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.module.getViewModel
 import com.anibalbastias.android.shopcart.base.view.BaseModuleFragment
 import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBinding
+import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.GetOfflineProductsListener
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
@@ -21,8 +23,11 @@ import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarT
 import com.anibalbastias.android.shopcart.presentation.util.implementObserver
 import com.anibalbastias.android.shopcart.presentation.util.initSwipe
 import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
+import io.realm.RealmResults
 
-class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItemViewData> {
+class ShopCartFragment : BaseModuleFragment(),
+    ShopCartItemListener<ProductsItemViewData>,
+    GetOfflineProductsListener {
 
     override fun tagName(): String = this::class.java.simpleName
     override fun layoutId(): Int = R.layout.fragment_shop_cart_list
@@ -76,7 +81,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it) })
+            errorBlock = { showErrorView(it, CounterActionViewData.CREATE) })
 
         // Post Inc counter by id
         implementObserver(shopCartViewModel.getPostIncCountersLiveData(),
@@ -87,7 +92,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it) })
+            errorBlock = { showErrorView(it, CounterActionViewData.INC) })
 
         // Post Dec counter by id
         implementObserver(shopCartViewModel.getPostDecCountersLiveData(),
@@ -98,7 +103,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it) })
+            errorBlock = { showErrorView(it, CounterActionViewData.DEC) })
 
         // Delete counter by id
         implementObserver(shopCartViewModel.getDeleteCounterLiveData(),
@@ -109,7 +114,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
                 )
             },
             loadingBlock = { showLoadingView() },
-            errorBlock = { showErrorView(it) })
+            errorBlock = { showErrorView(it, CounterActionViewData.DELETE) })
     }
 
     private fun getCountersData(
@@ -134,8 +139,30 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         }
     }
 
-    private fun showErrorView(errorMessage: String?) {
+    private fun showErrorView(
+        errorMessage: String?,
+        counterActionView: CounterActionViewData? = null
+    ) {
         shopCartViewModel.isLoading.set(false)
+        binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
+
+        when (counterActionView) {
+            CounterActionViewData.CREATE -> {
+
+            }
+            CounterActionViewData.INC -> {
+
+            }
+            CounterActionViewData.DEC -> {
+
+            }
+            CounterActionViewData.DELETE -> {
+
+            }
+            else -> {
+                shopCartViewModel.loadProductsListAsync(this)
+            }
+        }
     }
 
     private fun showLoadingView() {
@@ -178,5 +205,9 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
             shopCartViewModel.onDecCounterItem(item)
         else
             shopCartViewModel.onDeleteCounterItem(item)
+    }
+
+    override fun onGetProductsFromRealm(list: RealmResults<ProductsEntity>?) {
+        shopCartViewModel.setOfflineProducts(list)
     }
 }

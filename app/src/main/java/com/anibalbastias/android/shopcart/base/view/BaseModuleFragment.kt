@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.Navigator
 import com.anibalbastias.android.shopcart.base.module.ViewModelFactory
+import com.anibalbastias.android.shopcart.domain.db.RealmManager
 import com.anibalbastias.android.shopcart.presentation.util.inflate
 import javax.inject.Inject
 
@@ -29,7 +30,7 @@ abstract class BaseModuleFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        RealmManager.open()
+        RealmManager.open()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,7 +47,7 @@ abstract class BaseModuleFragment : Fragment() {
     }
 
     override fun onDestroy() {
-//        RealmManager.close()
+        RealmManager.close()
         super.onDestroy()
     }
 

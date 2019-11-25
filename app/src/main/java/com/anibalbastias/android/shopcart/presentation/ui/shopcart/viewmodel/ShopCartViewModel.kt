@@ -11,14 +11,21 @@ import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.CounterData
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
+import com.anibalbastias.android.shopcart.domain.db.RealmManager
+import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
+import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
 import com.anibalbastias.android.shopcart.presentation.context
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.GetOfflineProductsListener
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.realm.ProductsRealmMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
+import io.realm.RealmList
+import io.realm.RealmResults
 import javax.inject.Inject
 
 class ShopCartViewModel @Inject constructor(
@@ -29,7 +36,8 @@ class ShopCartViewModel @Inject constructor(
     private val postDecCountersUseCase: PostDecCountersUseCase,
     private val deleteCountersUseCase: DeleteCountersUseCase,
     private val productsViewDataMapper: ProductsViewDataMapper,
-    private val counterListViewDataMapper: CounterListViewDataMapper
+    private val counterListViewDataMapper: CounterListViewDataMapper,
+    private val productsRealmMapper: ProductsRealmMapper
 ) : BaseViewModel() {
 
     // region Observables
@@ -189,12 +197,12 @@ class ShopCartViewModel @Inject constructor(
                             // Create item and then Increment value
                             if (counterItem?.count == 0) {
                                 // Fix initial value when create
-                                if (counterItem.count == 0) {
+                                if (counterItem.count == 0 && !isError.get()) {
                                     counterItem.count = 1
 
                                     processCounter(
                                         counterActionView = CounterActionViewData.INC,
-                                        request = CounterData(id = counterItem?.id),
+                                        request = CounterData(id = counterItem.id),
                                         liveData = postIncCounterLiveData
                                     )
                                 }
@@ -205,6 +213,18 @@ class ShopCartViewModel @Inject constructor(
                 }
             }
         }
+
+        // Save products and counters in local database
+        val products = ProductsEntity()
+        products.keyword = "products"
+
+        val realmList = RealmList<ProductsItemEntity?>()
+        productList?.map { item ->
+            realmList.add(productsRealmMapper.executeMapping(item))
+        }
+        products.results = realmList
+
+        RealmManager.createProductListDao().save(products)
     }
     //endregion
 
@@ -253,5 +273,28 @@ class ShopCartViewModel @Inject constructor(
             )
         )
     }
+    //endregion
+
+    //region Realm Methods
+    fun loadProductsListAsync(callback: GetOfflineProductsListener?) {
+        val dataList = RealmManager.createProductListDao().loadAllAsync()
+        dataList.addChangeListener { t, _ ->
+            callback?.onGetProductsFromRealm(t)
+        }
+    }
+
+    fun setOfflineProducts(list: RealmResults<ProductsEntity>?) {
+        val productList = arrayListOf<ProductsItemViewData?>()
+
+        if (list?.isNotEmpty() == true) {
+            list[0]?.let { item ->
+                item.results?.map {
+                    productList.add(productsRealmMapper.inverseExecuteMapping(it))
+                }
+            }
+            shopCartList.set(productList)
+        }
+    }
+
     //endregion
 }

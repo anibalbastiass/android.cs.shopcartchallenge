@@ -5,6 +5,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class ProductAmountViewData(
-    val currency: String? = null,
-    val value: String? = null
+    var currency: String? = null,
+    var value: String? = null
 ) : Parcelable

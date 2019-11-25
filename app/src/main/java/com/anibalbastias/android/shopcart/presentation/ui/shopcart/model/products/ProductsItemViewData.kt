@@ -7,11 +7,11 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class ProductsItemViewData(
-    val itemId: String? = null,
-    val productAmountData: ProductAmountViewData? = null,
-    val subtitle: String? = null,
-    val imageUrl: String? = null,
-    val title: String? = null,
+    var itemId: String? = null,
+    var productAmountData: ProductAmountViewData? = null,
+    var subtitle: String? = null,
+    var imageUrl: String? = null,
+    var title: String? = null,
     var counter: ObservableField<CounterViewData>? = ObservableField(CounterViewData(count = 0)),
     var isUpdating: Boolean? = false
 ) : Parcelable
