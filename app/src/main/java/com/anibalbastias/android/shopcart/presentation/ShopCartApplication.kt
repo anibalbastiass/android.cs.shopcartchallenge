@@ -3,10 +3,13 @@ package com.anibalbastias.android.shopcart.presentation
 import android.content.Context
 import androidx.multidex.MultiDexApplication
 import androidx.fragment.app.Fragment
+import com.anibalbastias.android.shopcart.BuildConfig
 import com.anibalbastias.android.shopcart.base.view.BaseModuleFragment
 import com.anibalbastias.android.shopcart.presentation.component.ApplicationComponent
 import com.anibalbastias.android.shopcart.presentation.component.DaggerApplicationComponent
 import com.anibalbastias.android.shopcart.presentation.module.ApplicationModule
+import com.facebook.stetho.Stetho
+import com.uphyca.stetho_realm.RealmInspectorModulesProvider
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
@@ -14,6 +17,10 @@ var context: ShopCartApplication? = null
 fun getAppContext(): ShopCartApplication {
     return context!!
 }
+
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
 
 class ShopCartApplication : MultiDexApplication() {
 
@@ -28,6 +35,17 @@ class ShopCartApplication : MultiDexApplication() {
         context = this
         appContext = this
         setRealm()
+        setDebugStetho()
+    }
+
+    private fun setDebugStetho() {
+        if (BuildConfig.DEBUG) {
+            Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                    .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                    .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+                    .build())
+        }
     }
 
     private fun setRealm() {

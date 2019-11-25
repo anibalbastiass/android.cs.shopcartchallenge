@@ -6,7 +6,7 @@ import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counter
 import javax.inject.Inject
 
 /**
- * Created by anibalbastias on 2019-09-07.
+ * Created by anibalbastias on 2019-11-25.
  */
 
 open class CounterViewDataMapper @Inject constructor() : Mapper<CounterViewData?, CounterData?> {

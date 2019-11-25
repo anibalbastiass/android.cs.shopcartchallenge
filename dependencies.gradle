@@ -11,13 +11,17 @@ ext {
     appShopCartVersionCode = 1
     appShopCartVersionName = '0.0.1'
 
-    androidBuildToolsVersion = '"28.0.2"'
-    androidMinSdkVersion = 21
-    androidTargetSdkVersion = 28
-    androidCompileSdkVersion = 28
+    androidBuildToolsVersion = '"29.0.2"'
+    androidMinSdkVersion = 16
+    androidTargetSdkVersion = 29
+    androidCompileSdkVersion = 29
 
     //Libraries
     supportLibraryVersion = '28.0.0'
+    appCompatVersion = '1.1.0'
+    lyfeCycleExtVersion = '2.1.0'
+    materialVersion = '1.0.0'
+    lifeCycleJava8Version = '2.1.0'
     daggerVersion = '2.15'
     butterKnifeVersion = '8.8.1'
     roomVersion = '1.1.1'
@@ -57,8 +61,8 @@ ext {
                             butterKnifeCompiler     : "com.jakewharton:butterknife-compiler:${butterKnifeVersion}",
                             androidRecyclerView     : 'androidx.recyclerview:recyclerview:1.0.0',
                             androidCardView         : 'androidx.cardview:cardview:1.0.0',
-                            androidDesign           : 'com.google.android.material:material:1.0.0',
-                            androidCompatv7         : 'androidx.appcompat:appcompat:1.0.0',
+                            androidDesign           : "com.google.android.material:material:${materialVersion}",
+                            androidCompatv7         : "androidx.appcompat:appcompat:${appCompatVersion}",
                             androidSupportv4        : 'androidx.legacy:legacy-support-v4:1.0.0',
                             rxJava                  : "io.reactivex.rxjava2:rxkotlin:${rxJavaVersion}",
                             rxAndroid               : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
@@ -74,14 +78,19 @@ ext {
                             okhttp                  : "com.squareup.okhttp3:okhttp:${okHttpVersion}",
                             okhttpUrlconnection     : "com.squareup.okhttp3:okhttp-urlconnection:${okHttpVersion}",
                             kotlinStdlib            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}",
-                            androidArchExt          : 'androidx.lifecycle:lifecycle-extensions:2.0.0',
+                            androidArchExt          : "androidx.lifecycle:lifecycle-extensions:${lyfeCycleExtVersion}",
                             androidArchCompiler     : 'androidx.lifecycle:lifecycle-compiler:2.0.0',
                             room                    : 'androidx.room:room-runtime:2.0.0',
                             roomCompiler            : 'androidx.room:room-compiler:2.0.0',
                             roomRxJava              : 'androidx.room:room-rxjava2:2.0.0',
                             lcReactiveStreams       : 'androidx.lifecycle:lifecycle-reactivestreams:2.0.0',
                             glide                   : "com.github.bumptech.glide:glide:${glideVersion}",
-                            glideCompiler           : "com.github.bumptech.glide:compiler:${glideVersion}"
+                            glideCompiler           : "com.github.bumptech.glide:compiler:${glideVersion}",
+                            constraintLayout        : "androidx.constraintlayout:constraintlayout:${constraintLayoutVersion}",
+                            lifeCycleJava8Dep       : "androidx.lifecycle:lifecycle-common-java8:${lifeCycleJava8Version}",
+                            stetho                  : "com.facebook.stetho:stetho:1.5.0",
+                            stethoRealm             : "com.uphyca:stetho_realm:2.3.0",
+                            internetAvaibility      : 'com.treebo:internetavailabilitychecker:1.0.4'
 
     ]
 
@@ -175,24 +184,37 @@ ext {
                           navTest                 : "android.arch.navigation:navigation-testing:${nav_version}",
 
                           eventbus                : "org.greenrobot:eventbus:${eventbus_version}",
-                          constraintLayout        : "com.android.support.constraint:constraint-layout:$constraintLayoutVersion",
-                          customCauge             : "pl.pawelkleczkowski.customgauge:CustomGauge:${customCaugeVersion}",
+                          constraintLayout        : "com.android.support.constraint:constraint-layout:${constraintLayoutVersion}",
                           ktx                     : "androidx.core:core-ktx:${ktx_version}"
 
     ]
 
     // Architecture Components dependencies
-    dep = [testJunit          : "junit:junit:4.12",
-           gson               : "com.google.code.gson:gson:2.8.0",
-           supportAnnotations : "com.android.support:support-annotations:$supportLibraryVersion",
-           supportV4          : "com.android.support:support-v4:$supportLibraryVersion",
-           supportCompat      : "com.android.support:appcompat-v7:$supportLibraryVersion",
-           supportRecyclerview: "com.android.support:recyclerview-v7:$supportLibraryVersion",
-           supportCardView    : "com.android.support:cardview-v7:$supportLibraryVersion",
-           supportDesign      : "com.android.support:design:$supportLibraryVersion",
-           constraint_layout  : "com.android.support.constraint:constraint-layout:$constraintLayoutVersion",
-           lifecycleRuntime   : "android.arch.lifecycle:runtime:$androidArchVersion",
-           lifecycleExtensions: "android.arch.lifecycle:extensions:$androidArchVersion",
-           lifecycleJava8     : "android.arch.lifecycle:common-java8:$androidArchVersion",
-           lifecycleCompiler  : "android.arch.lifecycle:compiler:$androidArchVersion"]
+    archComponentsDep = [
+            testJunit          : "junit:junit:4.12",
+            coreTesting        : 'android.arch.core:core-testing:1.1.1',
+            gson               : "com.google.code.gson:gson:2.8.0",
+            supportAnnotations : "com.android.support:support-annotations:$supportLibraryVersion",
+            supportV4          : "com.android.support:support-v4:$supportLibraryVersion",
+            supportCompat      : "com.android.support:appcompat-v7:$supportLibraryVersion",
+            supportRecyclerview: "com.android.support:recyclerview-v7:$supportLibraryVersion",
+            supportCardView    : "com.android.support:cardview-v7:$supportLibraryVersion",
+            supportDesign      : "com.android.support:design:$supportLibraryVersion",
+            constraint_layout  : "com.android.support.constraint:constraint-layout:$constraintLayoutVersion",
+            lifecycleRuntime   : "android.arch.lifecycle:runtime:$androidArchVersion",
+            lifecycleExtensions: "android.arch.lifecycle:extensions:$androidArchVersion",
+            lifecycleJava8     : "android.arch.lifecycle:common-java8:$androidArchVersion",
+            lifecycleCompiler  : "android.arch.lifecycle:compiler:$androidArchVersion",
+            testRunner         : "androidx.test:runner:1.2.0",
+            espressoCore       : "androidx.test.espresso:espresso-core:3.2.0",
+            robolectric        : 'org.robolectric:robolectric:4.2',
+            robolectricMultidex: "org.robolectric:multidex:3.4.2",
+            mockitoKotlin      : 'com.nhaarman:mockito-kotlin:1.5.0',
+            androidXTestCore   : 'androidx.test:core:1.2.0',
+            activityKtx        : "androidx.activity:activity-ktx:1.1.0-rc02",
+            fragmentKtx        : "androidx.navigation:navigation-fragment-ktx:2.2.0-rc02",
+            navigationKtx      : "androidx.navigation:navigation-ui-ktx:2.2.0-rc02",
+            coreKtx            : 'androidx.core:core-ktx:1.2.0-rc01',
+            saveStateKtx       : 'androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02'
+    ]
 }

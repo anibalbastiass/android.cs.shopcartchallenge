@@ -11,6 +11,8 @@
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/primaryDarkColor
         </item>
 
+        <item name="android:windowBackground">@drawable/splashscreen</item>
+
         <item name="colorControlNormal">@color/primaryColor</item>
         <item name="colorControlActivated">@color/primaryDarkColor</item>
         <item name="colorControlHighlight">@color/circle2Color</item>
@@ -35,13 +37,9 @@
         <item name="android:actionModeBackground">@color/white</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
     <style name="PopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@color/white</item>
-        <item name="android:popupElevation">4dp</item>
+        <item name="android:popupElevation" tools:targetApi="lollipop">4dp</item>
     </style>
 
     <style name="PopupMenuTextAppearanceSmall">
@@ -71,12 +69,6 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="actionModeCloseButtonStyle">@style/closeButtonActionMode</item>
         <item name="android:typeface">monospace</item>
-    </style>
-
-    <style name="ToolbarShopCartDetails" parent="ToolBarDetailsStyle">
-        <item name="android:tint">@color/white</item>
-        <item name="colorControlNormal">@color/white</item>
-        <item name="android:fontFamily">@font/opensans_regular</item>
     </style>
 
 </resources>

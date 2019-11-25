@@ -3,6 +3,10 @@ package com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counte
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
 @Parcelize
 data class CounterViewData(
     var id: String? = null,

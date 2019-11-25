@@ -44,7 +44,8 @@
                 bind:layout_constraintTop_toTopOf="parent"
                 bind:layout_constraintWidth_percent="0.2"
                 bind:setImageUrl="@{item.imageUrl}"
-                tools:src="@mipmap/ic_launcher" />
+                tools:src="@mipmap/ic_launcher"
+                android:contentDescription="@string/itemProductDescription" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/shopCartItemContent"
@@ -68,7 +69,7 @@
                     android:maxLines="2"
                     android:text="@{item.title}"
                     android:textColor="@color/primaryColor"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintStart_toStartOf="parent"
                     bind:layout_constraintTop_toTopOf="parent"
@@ -83,7 +84,7 @@
                     android:maxLines="1"
                     android:text="@{item.productAmountData.currency +` `+item.productAmountData.value}"
                     android:textColor="@color/grey"
-                    android:textSize="12dp"
+                    android:textSize="@dimen/sp12"
                     bind:layout_constraintBottom_toTopOf="@+id/shopCartItemSubtitle"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintStart_toStartOf="parent"
@@ -99,11 +100,11 @@
                     android:fontFamily="@font/opensans_regular"
                     android:maxLines="1"
                     android:text="@{item.subtitle}"
-                    android:textSize="11dp"
+                    android:textSize="@dimen/sp12"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintStart_toStartOf="parent"
-                    tools:text="Subtitle" />
+                    tools:text="Price" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -124,9 +125,9 @@
                     android:clickable="@{item.isUpdating == false}"
                     android:maxLines="1"
                     android:onClick="@{() -> clickHandler.onAddCounterItem(item)}"
-                    android:text="ADD TO CART"
+                    android:text="@string/addCartButton"
                     android:textColor="@color/white"
-                    android:textSize="11sp"
+                    android:textSize="@dimen/sp12"
                     android:visibility="@{item.counter.count == 0 ? View.VISIBLE : View.GONE}"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toEndOf="parent"
@@ -142,26 +143,29 @@
                     android:fontFamily="@font/opensans_semibold"
                     android:maxLines="1"
                     android:onClick="@{() -> clickHandler.onDecCounterItem(item)}"
-                    android:text="-"
+                    android:text="@string/dec_button"
                     android:textColor="@color/white"
                     android:textSize="20sp"
+                    android:backgroundTint="@color/primaryColor"
                     android:visibility="@{item.counter.count > 0 ? View.VISIBLE : View.GONE}"
                     bind:layout_constraintBottom_toBottomOf="parent"
                     bind:layout_constraintEnd_toStartOf="@+id/shopCartItemIncButton"
                     bind:layout_constraintStart_toStartOf="parent"
                     bind:layout_constraintTop_toTopOf="parent"
                     bind:layout_constraintWidth_percent="0.5"
-                    tools:visibility="visible" />
+                    tools:visibility="visible"
+                    tools:targetApi="lollipop" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/shopCartItemIncButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="@color/accentColor"
                     android:clickable="@{item.isUpdating == false}"
                     android:fontFamily="@font/opensans_semibold"
                     android:maxLines="1"
                     android:onClick="@{() -> clickHandler.onIncCounterItem(item)}"
-                    android:text="+"
+                    android:text="@string/inc_button"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:visibility="@{item.counter.count > 0 ? View.VISIBLE : View.GONE}"
@@ -169,6 +173,7 @@
                     bind:layout_constraintEnd_toEndOf="parent"
                     bind:layout_constraintTop_toTopOf="parent"
                     bind:layout_constraintWidth_percent="0.5"
+                    tools:targetApi="lollipop"
                     tools:visibility="visible" />
 
                 <TextView

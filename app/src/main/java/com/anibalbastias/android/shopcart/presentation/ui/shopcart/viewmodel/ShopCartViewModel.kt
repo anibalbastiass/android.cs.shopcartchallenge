@@ -10,16 +10,28 @@ import com.anibalbastias.android.shopcart.base.view.BaseViewModel
 import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.CounterData
+import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
+import com.anibalbastias.android.shopcart.domain.db.RealmManager
+import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
+import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
 import com.anibalbastias.android.shopcart.presentation.context
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionData
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.realm.ProductsRealmMapper
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
+import io.realm.RealmList
+import io.realm.RealmResults
 import javax.inject.Inject
+import kotlin.math.absoluteValue
+
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
 
 class ShopCartViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
@@ -29,7 +41,8 @@ class ShopCartViewModel @Inject constructor(
     private val postDecCountersUseCase: PostDecCountersUseCase,
     private val deleteCountersUseCase: DeleteCountersUseCase,
     private val productsViewDataMapper: ProductsViewDataMapper,
-    private val counterListViewDataMapper: CounterListViewDataMapper
+    private val counterListViewDataMapper: CounterListViewDataMapper,
+    private val productsRealmMapper: ProductsRealmMapper
 ) : BaseViewModel() {
 
     // region Observables
@@ -38,9 +51,10 @@ class ShopCartViewModel @Inject constructor(
     var shopCartList: ObservableField<ArrayList<ProductsItemViewData?>> =
         ObservableField(arrayListOf())
     var shopCartTotalCount: ObservableInt = ObservableInt(0)
+    var requestItem: ObservableField<ProductsItemViewData> = ObservableField(ProductsItemViewData())
     // endregion
 
-    var shopCartItemLayout: Int = R.layout.view_cell_shop_cart_item
+    var shopCartItemLayout: Int? = R.layout.view_cell_shop_cart_item
 
     override fun onCleared() {
         getProductsUseCase.dispose()
@@ -53,6 +67,8 @@ class ShopCartViewModel @Inject constructor(
     }
 
     //region Live Data
+    var hasConnectionLiveData: MutableLiveData<Boolean> = MutableLiveData()
+
     private val getProductsLiveData: MutableLiveData<Resource<ProductsViewData>> = MutableLiveData()
 
     fun getProductsLiveData() = getProductsLiveData
@@ -116,11 +132,13 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun addCounterItem(item: ProductsItemViewData) {
+        requestItem.set(item)
+
         item.mapCounterProduct {
-            it?.counter?.set(CounterViewData(count = 1))
+            it?.counter?.set(CounterViewData(id = item.counter?.get()?.title, count = 1))
 
             processCounter(
-                counterAction = CounterActionData.CREATE,
+                counterActionView = CounterActionViewData.CREATE,
                 request = CounterData(title = it?.itemId),
                 liveData = postCreateCounterLiveData
             )
@@ -128,12 +146,14 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun onIncCounterItem(item: ProductsItemViewData) {
+        requestItem.set(item)
+
         item.mapCounterProduct {
             item.counter?.get()?.id?.let { id ->
                 updateTempCounter(item, 1)
 
                 processCounter(
-                    counterAction = CounterActionData.INC,
+                    counterActionView = CounterActionViewData.INC,
                     request = CounterData(id = id),
                     liveData = postIncCounterLiveData
                 )
@@ -141,13 +161,13 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
-    fun onDecCounterItem(item: ProductsItemViewData) {
+    private fun onDecCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
             item.counter?.get()?.id?.let { id ->
                 updateTempCounter(item, -1)
 
                 processCounter(
-                    counterAction = CounterActionData.DEC,
+                    counterActionView = CounterActionViewData.DEC,
                     request = CounterData(id = id),
                     liveData = postDecCounterLiveData
                 )
@@ -155,13 +175,13 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteCounterItem(item: ProductsItemViewData) {
+    private fun onDeleteCounterItem(item: ProductsItemViewData) {
         item.mapCounterProduct {
             item.counter?.get()?.id?.let { id ->
                 updateTempCounter(item)
 
                 processCounter(
-                    counterAction = CounterActionData.DELETE,
+                    counterActionView = CounterActionViewData.DELETE,
                     request = CounterData(id = id),
                     liveData = deleteCounterLiveData
                 )
@@ -169,8 +189,17 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
+    fun checkDecDeleteCounterItem(item: ProductsItemViewData) {
+        requestItem.set(item)
+
+        if (item.counter?.get()?.count!! > 1)
+            onDecCounterItem(item)
+        else
+            onDeleteCounterItem(item)
+    }
+
     fun setAndMapCounters(
-        counterAction: CounterActionData? = null,
+        counterActionView: CounterActionViewData? = null,
         counterList: List<CounterViewData?>
     ) {
         val productList = shopCartList.get()
@@ -184,17 +213,17 @@ class ShopCartViewModel @Inject constructor(
                     productItem?.isUpdating = false
 
                     // If create a counter, then increment counter to 1
-                    when (counterAction) {
-                        CounterActionData.CREATE -> {
+                    when (counterActionView) {
+                        CounterActionViewData.CREATE -> {
                             // Create item and then Increment value
                             if (counterItem?.count == 0) {
                                 // Fix initial value when create
-                                if (counterItem.count == 0) {
+                                if (counterItem.count == 0 && !isError.get()) {
                                     counterItem.count = 1
 
                                     processCounter(
-                                        counterAction = CounterActionData.INC,
-                                        request = CounterData(id = counterItem?.id),
+                                        counterActionView = CounterActionViewData.INC,
+                                        request = CounterData(id = counterItem.id),
                                         liveData = postIncCounterLiveData
                                     )
                                 }
@@ -205,6 +234,18 @@ class ShopCartViewModel @Inject constructor(
                 }
             }
         }
+
+        // Save products and counters in local database
+        val products = ProductsEntity()
+        products.keyword = "products"
+
+        val realmList = RealmList<ProductsItemEntity?>()
+        productList?.map { item ->
+            realmList.add(productsRealmMapper.executeMapping(item))
+        }
+        products.results = realmList
+
+        RealmManager.createProductListDao().save(products)
     }
     //endregion
 
@@ -222,24 +263,55 @@ class ShopCartViewModel @Inject constructor(
     private fun processCounter(
         liveData: MutableLiveData<Resource<List<CounterViewData?>>>,
         request: CounterData? = null,
-        counterAction: CounterActionData
+        counterActionView: CounterActionViewData
     ) {
+        if (hasConnectionLiveData.value == true) {
+            liveData.postValue(Resource(ResourceState.LOADING, null, null))
 
-        liveData.postValue(Resource(ResourceState.LOADING, null, null))
+            val useCase = when (counterActionView) {
+                CounterActionViewData.CREATE -> {
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
+                    postCountersUseCase
+                }
+                CounterActionViewData.INC -> {
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
+                    postIncCountersUseCase
+                }
+                CounterActionViewData.DEC -> {
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
+                    postDecCountersUseCase
+                }
+                CounterActionViewData.DELETE -> {
+                    updatePendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
+                    deleteCountersUseCase
+                }
+                CounterActionViewData.DEFAULT -> TODO()
+            }
 
-        val useCase = when (counterAction) {
-            CounterActionData.CREATE -> postCountersUseCase
-            CounterActionData.INC -> postIncCountersUseCase
-            CounterActionData.DEC -> postDecCountersUseCase
-            CounterActionData.DELETE -> deleteCountersUseCase
+            return useCase.execute(
+                BaseSubscriber(
+                    context?.applicationContext, this, counterListViewDataMapper,
+                    liveData, isLoading, isError
+                ), request
+            )
+        } else {
+            // Create pendent counters into local database
+            when (counterActionView) {
+                CounterActionViewData.CREATE -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_CREATE)
+                }
+                CounterActionViewData.INC -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_INC)
+                }
+                CounterActionViewData.DEC -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_DEC)
+                }
+                CounterActionViewData.DELETE -> {
+                    processPendentCounterAsync(CounterEntity.ACTION_COUNTER_DELETE)
+                }
+                CounterActionViewData.DEFAULT -> TODO()
+            }
         }
-
-        return useCase.execute(
-            BaseSubscriber(
-                context?.applicationContext, this, counterListViewDataMapper,
-                liveData, isLoading, isError
-            ), request
-        )
     }
 
     fun fetchAllProducts(showLoading: Boolean? = true) {
@@ -252,6 +324,72 @@ class ShopCartViewModel @Inject constructor(
                 getProductsLiveData, isLoading, isError
             )
         )
+    }
+    //endregion
+
+    //region Realm Methods
+    fun loadProductsListAsync() {
+        val dataList = RealmManager.createProductListDao().loadAllAsync()
+        dataList.addChangeListener { t, _ ->
+            // Update data
+            setOfflineProducts(t)
+        }
+    }
+
+    private fun getCurrentCounter(action: String): CounterEntity {
+        val reqItem = requestItem.get()?.counter?.get()!!
+        val counter = CounterEntity()
+        counter.id = reqItem.id
+        counter.title = reqItem.title
+        counter.count = reqItem.count
+        counter.state = CounterEntity.STATE_COUNTER_PENDENT
+        counter.action = action
+        return counter
+    }
+
+    private fun processPendentCounterAsync(action: String) {
+        RealmManager.createCounterListDao().save(getCurrentCounter(action))
+    }
+
+    private fun updatePendentCounterAsync(action: String) {
+        if (getCurrentCounter(action).state == CounterEntity.STATE_COUNTER_PENDENT) {
+            getCurrentCounter(action).state = CounterEntity.STATE_COUNTER_SENT
+            RealmManager.createCounterListDao().save(getCurrentCounter(action))
+        }
+    }
+
+    private fun setOfflineProducts(list: RealmResults<ProductsEntity>?) {
+        val productList = arrayListOf<ProductsItemViewData?>()
+
+        if (list?.isNotEmpty() == true) {
+            list[0]?.let { item ->
+                item.results?.map {
+                    productList.add(productsRealmMapper.inverseExecuteMapping(it))
+                }
+            }
+            shopCartList.set(productList)
+        }
+    }
+
+    fun checkPendentTransactions() {
+        val dataList = RealmManager.createCounterListDao().loadAll()
+        dataList.addChangeListener { counterList, _ ->
+            // Update data
+            counterList.map { counter ->
+                if (counter.state == CounterEntity.STATE_COUNTER_PENDENT) {
+                    if (counter.id == requestItem.get()?.counter?.get()?.id) {
+                        val diffCount = (counter.count ?: 0
+                        - requestItem.get()?.counter?.get()?.count!!).absoluteValue
+
+                        if (diffCount > 0) {
+                            for (i in 0..diffCount) {
+                                // TODO: Send pendent data
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     //endregion
 }

@@ -1,6 +1,7 @@
 package com.anibalbastias.android.shopcart.presentation.ui.shopcart
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -12,23 +13,29 @@ import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBindin
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionData
+import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel.ShopCartViewModel
-import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarTitle
-import com.anibalbastias.android.shopcart.presentation.util.implementObserver
-import com.anibalbastias.android.shopcart.presentation.util.initSwipe
-import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
+import com.anibalbastias.android.shopcart.presentation.util.*
+import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker
+import com.treebo.internetavailabilitychecker.InternetConnectivityListener
 
-class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItemViewData> {
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
+class ShopCartFragment : BaseModuleFragment(),
+    ShopCartItemListener<ProductsItemViewData>,
+    InternetConnectivityListener {
 
     override fun tagName(): String = this::class.java.simpleName
     override fun layoutId(): Int = R.layout.fragment_shop_cart_list
 
     private lateinit var binding: FragmentShopCartListBinding
     private lateinit var shopCartViewModel: ShopCartViewModel
+    private var mInternetAvailabilityChecker: InternetAvailabilityChecker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +43,14 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         navBaseViewModel = getViewModel(viewModelFactory)
         sharedViewModel = activity!!.getViewModel(SavedStateViewModelFactory(getAppContext(), this))
         shopCartViewModel = getViewModel(viewModelFactory)
+        setInternetAvailabilityChecker()
         setHasOptionsMenu(true)
+    }
+
+    private fun setInternetAvailabilityChecker() {
+        InternetAvailabilityChecker.init(context)
+        mInternetAvailabilityChecker = InternetAvailabilityChecker.getInstance()
+        mInternetAvailabilityChecker?.addInternetConnectivityListener(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,7 +65,15 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
 
         initToolbar()
         initViewModel()
+        observeConnectionState()
         fetchProducts()
+    }
+
+    private fun initToolbar() {
+        binding.shopCartToolbar?.run {
+            applyFontForToolbarTitle(activity!!)
+            setNoArrowUpToolbar(activity!!)
+        }
     }
 
     private fun initViewModel() {
@@ -71,7 +93,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getPostCreateCounterLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.CREATE,
+                    CounterActionViewData.CREATE,
                     viewData
                 )
             },
@@ -82,7 +104,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getPostIncCountersLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.INC,
+                    CounterActionViewData.INC,
                     viewData
                 )
             },
@@ -93,7 +115,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getPostDecCountersLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.DEC,
+                    CounterActionViewData.DEC,
                     viewData
                 )
             },
@@ -104,7 +126,7 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         implementObserver(shopCartViewModel.getDeleteCounterLiveData(),
             successBlock = { viewData ->
                 getCountersData(
-                    CounterActionData.DELETE,
+                    CounterActionViewData.DELETE,
                     viewData
                 )
             },
@@ -112,11 +134,19 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
             errorBlock = { showErrorView(it) })
     }
 
+    private fun observeConnectionState() {
+        shopCartViewModel.run {
+            hasConnectionLiveData.initObserver(this@ShopCartFragment) { hasConnection ->
+                if (hasConnection == true) checkPendentTransactions()
+            }
+        }
+    }
+
     private fun getCountersData(
-        counterAction: CounterActionData? = null,
+        counterActionView: CounterActionViewData? = null,
         viewData: List<CounterViewData?>
     ) {
-        shopCartViewModel.setAndMapCounters(counterAction, viewData)
+        shopCartViewModel.setAndMapCounters(counterActionView, viewData)
     }
 
     private fun getProductsData(viewData: ProductsViewData) {
@@ -135,7 +165,13 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     private fun showErrorView(errorMessage: String?) {
-        shopCartViewModel.isLoading.set(false)
+        Log.e("Error Message", errorMessage!!)
+
+        shopCartViewModel.apply {
+            isLoading.set(false)
+            binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
+            loadProductsListAsync()
+        }
     }
 
     private fun showLoadingView() {
@@ -158,13 +194,6 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
         }
     }
 
-    private fun initToolbar() {
-        binding.shopCartToolbar?.run {
-            applyFontForToolbarTitle(activity!!)
-            setNoArrowUpToolbar(activity!!)
-        }
-    }
-
     override fun onAddCounterItem(item: ProductsItemViewData) {
         shopCartViewModel.addCounterItem(item)
     }
@@ -174,9 +203,15 @@ class ShopCartFragment : BaseModuleFragment(), ShopCartItemListener<ProductsItem
     }
 
     override fun onDecCounterItem(item: ProductsItemViewData) {
-        if (item.counter?.get()?.count!! > 1)
-            shopCartViewModel.onDecCounterItem(item)
-        else
-            shopCartViewModel.onDeleteCounterItem(item)
+        shopCartViewModel.checkDecDeleteCounterItem(item)
+    }
+
+    override fun onDestroy() {
+        mInternetAvailabilityChecker?.removeInternetConnectivityChangeListener(this)
+        super.onDestroy()
+    }
+
+    override fun onInternetConnectivityChanged(isConnected: Boolean) {
+        shopCartViewModel.hasConnectionLiveData.postValue(isConnected)
     }
 }
