@@ -24,6 +24,41 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            jvmArgs "-Xms2g", "-Xmx2g", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+DisableExplicitGC"
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+            }
+        }
+    }
+    sourceSets {
+        debug {
+            java.srcDirs = ['src/debug/java', 'src/debug/java/']
+        }
+        main {
+            resources {
+                srcDir '../buildsystem/'
+            }
+        }
+    }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/androidx.exifinterface_exifinterface.version'
+        pickFirst 'lib/armeabi-v7a/libtool-checker.so'
+        pickFirst 'lib/arm64-v8a/libtool-checker.so'
+        pickFirst 'lib/x86/libtool-checker.so'
+        pickFirst 'lib/x86_64/libtool-checker.so'
+    }
+    dexOptions {
+        jumboMode = true
+    }
+
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
@@ -116,7 +151,6 @@ dependencies {
     // Roboelectric: Integration tests
     testImplementation testDependencies.robolectric
     testImplementation testDependencies.robolectricMultidex
-    testImplementation testDependencies.roboShadowsDex
     testImplementation testDependencies.mockitoKotlin
     testImplementation testDependencies.androidXTestCore
     testImplementation testDependencies.mockitoInline
