@@ -23,7 +23,12 @@ class CountersDao(realm: Realm?) {
     }
 
     fun save(user: CounterEntity) {
-        mRealm.executeTransaction { realm -> realm.copyToRealmOrUpdate(user) }
+        mRealm.executeTransaction { realm ->
+            run {
+                Log.e("ShopCartRealm", "Insert data: $user")
+                realm.copyToRealmOrUpdate(user)
+            }
+        }
     }
 
     fun save(userList: List<CounterEntity>) {

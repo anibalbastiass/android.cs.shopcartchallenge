@@ -1,5 +1,6 @@
 package com.anibalbastias.android.shopcart.presentation.ui.shopcart.viewmodel
 
+import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt

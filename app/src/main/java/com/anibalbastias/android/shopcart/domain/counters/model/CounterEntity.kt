@@ -70,4 +70,8 @@ open class CounterEntity : RealmObject() {
             return true
         }
     }
+
+    override fun toString(): String {
+        return "CounterEntity(id=$id, title=$title, count=$count, state=$state, action=$action)"
+    }
 }

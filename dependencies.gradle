@@ -87,7 +87,9 @@ ext {
                             glide                   : "com.github.bumptech.glide:glide:${glideVersion}",
                             glideCompiler           : "com.github.bumptech.glide:compiler:${glideVersion}",
                             constraintLayout        : "androidx.constraintlayout:constraintlayout:${constraintLayoutVersion}",
-                            lifeCycleJava8Dep       : "androidx.lifecycle:lifecycle-common-java8:${lifeCycleJava8Version}"
+                            lifeCycleJava8Dep       : "androidx.lifecycle:lifecycle-common-java8:${lifeCycleJava8Version}",
+                            stetho                  : "com.facebook.stetho:stetho:1.5.0",
+                            stethoRealm             : "com.uphyca:stetho_realm:2.3.0"
 
     ]
 

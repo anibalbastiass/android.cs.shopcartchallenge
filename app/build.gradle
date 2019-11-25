@@ -92,6 +92,10 @@ dependencies {
     implementation presentationDependencies.roomRxJava
     implementation presentationDependencies.lcReactiveStreams
 
+    // Stetho Debugger
+    implementation presentationDependencies.stetho
+    implementation presentationDependencies.stethoRealm
+
     // Glide
     api presentationDependencies.glide
     kapt presentationDependencies.glideCompiler
