@@ -14,7 +14,7 @@ Goal: Build a app consuming a ElasticBeanstalk AWS NodeJS instance with a API RE
 
 - Frontend (Android):
   - From a personal project with a solid, scalable and clean architecture for Android apps (CLEAN + MVVM), begins complete features for this project.
-  - Work with TDD (Test Drive Development) for build with Unit tests with Mockito (Unit tests), Roboelectric (Integration Tests) and Espresso (Instrumental tests).
+  - Work with TDD (Test Drive Development) for build with Unit tests with Mockito (Unit tests).
 
 This project contains the following milestones
 
@@ -25,7 +25,7 @@ This project contains the following milestones
 - Keep clean code and use minimal dependencies
 
 - Navigation:
-This app contains a single activity with a Navigation Controller with some Fragments: `CartListFragment` and `CartDetailFragment`
+This app contains a single activity with a Navigation Controller with a Fragment: `ShopCartFragment`
 
 - ViewModel:
 This component is useful for share and save data throw Live Data
