@@ -51,7 +51,7 @@ class ShopCartViewModel @Inject constructor(
     var requestItem: ObservableField<ProductsItemViewData> = ObservableField(ProductsItemViewData())
     // endregion
 
-    var shopCartItemLayout: Int = R.layout.view_cell_shop_cart_item
+    var shopCartItemLayout: Int? = R.layout.view_cell_shop_cart_item
 
     override fun onCleared() {
         getProductsUseCase.dispose()

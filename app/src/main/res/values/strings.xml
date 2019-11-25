@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">Shop Cart App</string>
-    <string name="generic_error_message">Cannot connect to internet. Check your connection please</string>
     <string name="empty_items">No items available in this moment. Try again please</string>
 </resources>
