@@ -56,7 +56,7 @@ abstract class BaseModuleFragment : Fragment() {
     fun setNavController(view: View?) {
         view?.let {
             navController = Navigation.findNavController(it)
-            navBaseViewModel.getNewDestination().observe(this, Observer { dest ->
+            navBaseViewModel.getNewDestination().observe(this@BaseModuleFragment, Observer { dest ->
                 if (dest.first.status == ResourceState.LOADING) {
                     dest.second?.let { listener ->
                         listener.onNextNavigate(dest.first.consume())

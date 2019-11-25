@@ -36,6 +36,13 @@ These are the ones in charge of refreshing data for UI throw Observable vars.
 - Realm (Room in a future):
 Save and get local database for keep persistence if the device lost internet connection and when this go back, send pendent data and sync these.
 
+- Unit Testing
+Implement test for ViewModel throw captors, mocks for check stats for LiveData too.
+
+## Screenshot
+
+![Shop Cart App](https://raw.githubusercontent.com/anibalbastiass/android.cs.shopcartchallenge/develop/screenshots/photo1.png)
+
 
 ## Resources
 
