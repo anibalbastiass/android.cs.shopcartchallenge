@@ -27,6 +27,7 @@ class ShopCartApplication : MultiDexApplication() {
     companion object {
         lateinit var appContext: Context
         var applicationComponent: ApplicationComponent? = null
+        var isTest: Boolean? = false
     }
 
     override fun onCreate() {
@@ -44,16 +45,19 @@ class ShopCartApplication : MultiDexApplication() {
                 Stetho.newInitializerBuilder(this)
                     .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                     .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                    .build())
+                    .build()
+            )
         }
     }
 
     private fun setRealm() {
-        // Initialize Realm (just once per application)
-        Realm.init(this)
-        RealmConfiguration.Builder()
-            .deleteRealmIfMigrationNeeded()
-            .build()
+        if (!isTest!!) {
+            // Initialize Realm (just once per application)
+            Realm.init(this)
+            RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build()
+        }
     }
 }
 

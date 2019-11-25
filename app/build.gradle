@@ -154,8 +154,4 @@ dependencies {
     testImplementation testDependencies.mockitoKotlin
     testImplementation testDependencies.androidXTestCore
     testImplementation testDependencies.mockitoInline
-
-    // Espresso: Instrumental tests
-    androidTestImplementation testDependencies.testRunner
-    androidTestImplementation testDependencies.espressoCore
 }
