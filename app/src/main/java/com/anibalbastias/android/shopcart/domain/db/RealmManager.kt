@@ -1,5 +1,6 @@
 package com.anibalbastias.android.shopcart.domain.db
 
+import com.anibalbastias.android.shopcart.domain.counters.dao.CountersDao
 import com.anibalbastias.android.shopcart.domain.products.dao.ProductsDao
 import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
 import io.realm.Realm
@@ -28,6 +29,11 @@ object RealmManager {
     fun createProductListDao(): ProductsDao {
         checkForOpenRealm()
         return ProductsDao(mRealm)
+    }
+
+    fun createCounterListDao(): CountersDao {
+        checkForOpenRealm()
+        return CountersDao(mRealm)
     }
 
     fun clear() {

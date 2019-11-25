@@ -10,6 +10,21 @@ open class CounterEntity : RealmObject() {
     var id: String? = null
     var title: String? = null
     var count: Int? = null
+    var state: StateCounter? = StateCounter.DEFAULT
+    var action: ActionCounter? = null
+
+    enum class ActionCounter {
+        CREATE,
+        INC,
+        DELETE
+    }
+
+    enum class StateCounter {
+        DEFAULT,
+        PENDENT,
+        SENT,
+        ERROR
+    }
 
     companion object {
 

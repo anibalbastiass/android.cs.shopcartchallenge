@@ -9,4 +9,7 @@ import io.realm.RealmResults
 
 interface GetOfflineProductsListener {
     fun onGetProductsFromRealm(list: RealmResults<ProductsEntity>?)
+    fun createPendentCounterFromRealm(t: RealmResults<ProductsEntity>?) {
+
+    }
 }

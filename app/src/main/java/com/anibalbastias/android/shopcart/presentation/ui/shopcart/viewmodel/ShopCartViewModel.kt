@@ -10,6 +10,7 @@ import com.anibalbastias.android.shopcart.base.view.BaseViewModel
 import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.data.dataStoreFactory.counters.model.CounterData
+import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import com.anibalbastias.android.shopcart.domain.counters.usecase.*
 import com.anibalbastias.android.shopcart.domain.db.RealmManager
 import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEntity
@@ -46,6 +47,7 @@ class ShopCartViewModel @Inject constructor(
     var shopCartList: ObservableField<ArrayList<ProductsItemViewData?>> =
         ObservableField(arrayListOf())
     var shopCartTotalCount: ObservableInt = ObservableInt(0)
+    var requestItem: ObservableField<ProductsItemViewData> = ObservableField(ProductsItemViewData())
     // endregion
 
     var shopCartItemLayout: Int = R.layout.view_cell_shop_cart_item
@@ -281,6 +283,21 @@ class ShopCartViewModel @Inject constructor(
         dataList.addChangeListener { t, _ ->
             callback?.onGetProductsFromRealm(t)
         }
+    }
+
+    private fun getPendentCounter(action: CounterEntity.ActionCounter): CounterEntity {
+        val reqItem = requestItem.get()?.counter?.get()!!
+        val counter = CounterEntity()
+        counter.id = reqItem.id
+        counter.title = reqItem.title
+        counter.count = reqItem.count
+        counter.state = CounterEntity.StateCounter.PENDENT
+        counter.action = action
+        return counter
+    }
+
+    fun processPendentCounterAsync(action: CounterEntity.ActionCounter) {
+        RealmManager.createCounterListDao().save(getPendentCounter(action))
     }
 
     fun setOfflineProducts(list: RealmResults<ProductsEntity>?) {

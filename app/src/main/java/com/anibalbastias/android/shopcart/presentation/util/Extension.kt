@@ -3,9 +3,11 @@ package com.anibalbastias.android.shopcart.presentation.util
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.IntentFilter
 import android.content.res.Configuration
-import android.net.Uri
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import android.os.Build
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -24,6 +26,7 @@ import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.view.Resource
 import com.anibalbastias.android.shopcart.base.view.ResourceState
 import com.anibalbastias.android.shopcart.presentation.GlideApp
+import com.anibalbastias.android.shopcart.presentation.service.connection.InternetCheckReceiver
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.util.*
 
@@ -117,24 +120,36 @@ fun SwipeRefreshLayout.initSwipe(onSwipeUnit: (() -> Unit)?) {
  * Implements a custom observer
  * to a MutableLiveData object
  */
-fun <T> Fragment.implementObserver(mutableLiveData: MutableLiveData<Resource<T>>,
-                                   successBlock: (T) -> Unit = {},
-                                   loadingBlock: () -> Unit = {},
-                                   errorBlock: (String?) -> Unit = {},
-                                   defaultBlock: () -> Unit = {},
-                                   codeBlock: () -> Unit = {},
-                                   hideLoadingBlock: () -> Unit = {}) {
+fun <T> Fragment.implementObserver(
+    mutableLiveData: MutableLiveData<Resource<T>>,
+    successBlock: (T) -> Unit = {},
+    loadingBlock: () -> Unit = {},
+    errorBlock: (String?) -> Unit = {},
+    defaultBlock: () -> Unit = {},
+    codeBlock: () -> Unit = {},
+    hideLoadingBlock: () -> Unit = {}
+) {
 
-    handleObserver(mutableLiveData, defaultBlock, successBlock, loadingBlock, errorBlock, codeBlock, hideLoadingBlock)
+    handleObserver(
+        mutableLiveData,
+        defaultBlock,
+        successBlock,
+        loadingBlock,
+        errorBlock,
+        codeBlock,
+        hideLoadingBlock
+    )
 }
 
-private fun <T> Fragment.handleObserver(mutableLiveData: MutableLiveData<Resource<T>>,
-                                        defaultBlock: () -> Unit,
-                                        successBlock: (T) -> Unit,
-                                        loadingBlock: () -> Unit,
-                                        errorBlock: (String?) -> Unit,
-                                        codeBlock: () -> Unit,
-                                        hideLoadingBlock: () -> Unit = {}) {
+private fun <T> Fragment.handleObserver(
+    mutableLiveData: MutableLiveData<Resource<T>>,
+    defaultBlock: () -> Unit,
+    successBlock: (T) -> Unit,
+    loadingBlock: () -> Unit,
+    errorBlock: (String?) -> Unit,
+    codeBlock: () -> Unit,
+    hideLoadingBlock: () -> Unit = {}
+) {
     mutableLiveData.initObserver(this) {
         handleStateObservers(
             codeBlock,
@@ -148,13 +163,15 @@ private fun <T> Fragment.handleObserver(mutableLiveData: MutableLiveData<Resourc
     }
 }
 
-private fun <T> handleStateObservers(codeBlock: () -> Unit,
-                                     it: Resource<T>?,
-                                     defaultBlock: () -> Unit,
-                                     successBlock: (T) -> Unit,
-                                     loadingBlock: () -> Unit,
-                                     errorBlock: (String?) -> Unit,
-                                     hideLoadingBlock: () -> Unit = {}) {
+private fun <T> handleStateObservers(
+    codeBlock: () -> Unit,
+    it: Resource<T>?,
+    defaultBlock: () -> Unit,
+    successBlock: (T) -> Unit,
+    loadingBlock: () -> Unit,
+    errorBlock: (String?) -> Unit,
+    hideLoadingBlock: () -> Unit = {}
+) {
     codeBlock()
 
     when (it?.status) {
@@ -177,4 +194,35 @@ fun RecyclerView.runLayoutAnimation() {
     layoutAnimation = AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down)
     adapter?.notifyDataSetChanged()
     scheduleLayoutAnimation()
+}
+
+fun Context.isConnectingToInternet(): Boolean {
+    val connectivity = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+    if (connectivity != null) {
+        val info = connectivity.allNetworkInfo
+        info?.forEach { networkInfo ->
+            if (networkInfo.state == NetworkInfo.State.CONNECTED) {
+                return true
+            }
+        }
+    }
+    return false
+}
+
+fun Context.registerConnectionReceiver(callback: CheckInternetConnectionListener?) {
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        val receiver = InternetCheckReceiver()
+        receiver.callback = callback
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.anibalbastias.android.shopcart.presentation.CONNECTIVITY_CHANGE")
+        registerReceiver(receiver, intentFilter)
+    } else {
+        callback?.onChangeInternetConnection(isConnectingToInternet())
+    }
+}
+
+interface CheckInternetConnectionListener {
+    fun onChangeInternetConnection(connected: Boolean)
 }
