@@ -4,7 +4,7 @@ import android.view.View
 import com.anibalbastias.android.shopcart.presentation.util.adapter.base.BaseBindClickHandler
 
 /**
- * Created by anibalbastias on 2019-08-13.
+ * Created by anibalbastias on 2019-11-25.
  */
 
 interface ShopCartItemListener<T> : BaseBindClickHandler<T> {

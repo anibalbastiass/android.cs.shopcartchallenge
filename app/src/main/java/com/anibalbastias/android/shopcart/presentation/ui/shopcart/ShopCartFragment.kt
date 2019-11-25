@@ -9,10 +9,8 @@ import com.anibalbastias.android.shopcart.R
 import com.anibalbastias.android.shopcart.base.module.getViewModel
 import com.anibalbastias.android.shopcart.base.view.BaseModuleFragment
 import com.anibalbastias.android.shopcart.databinding.FragmentShopCartListBinding
-import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
 import com.anibalbastias.android.shopcart.presentation.appComponent
 import com.anibalbastias.android.shopcart.presentation.getAppContext
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.GetOfflineProductsListener
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.ShopCartItemListener
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterActionViewData
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
@@ -23,11 +21,13 @@ import com.anibalbastias.android.shopcart.presentation.util.applyFontForToolbarT
 import com.anibalbastias.android.shopcart.presentation.util.implementObserver
 import com.anibalbastias.android.shopcart.presentation.util.initSwipe
 import com.anibalbastias.android.shopcart.presentation.util.setNoArrowUpToolbar
-import io.realm.RealmResults
+
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
 
 class ShopCartFragment : BaseModuleFragment(),
-    ShopCartItemListener<ProductsItemViewData>,
-    GetOfflineProductsListener {
+    ShopCartItemListener<ProductsItemViewData> {
 
     override fun tagName(): String = this::class.java.simpleName
     override fun layoutId(): Int = R.layout.fragment_shop_cart_list
@@ -57,6 +57,13 @@ class ShopCartFragment : BaseModuleFragment(),
         initToolbar()
         initViewModel()
         fetchProducts()
+    }
+
+    private fun initToolbar() {
+        binding.shopCartToolbar?.run {
+            applyFontForToolbarTitle(activity!!)
+            setNoArrowUpToolbar(activity!!)
+        }
     }
 
     private fun initViewModel() {
@@ -143,7 +150,7 @@ class ShopCartFragment : BaseModuleFragment(),
         shopCartViewModel.apply {
             isLoading.set(false)
             binding.shopCartListSwipeRefreshLayout?.isRefreshing = false
-            loadProductsListAsync(this@ShopCartFragment)
+            loadProductsListAsync()
         }
     }
 
@@ -167,35 +174,15 @@ class ShopCartFragment : BaseModuleFragment(),
         }
     }
 
-    private fun initToolbar() {
-        binding.shopCartToolbar?.run {
-            applyFontForToolbarTitle(activity!!)
-            setNoArrowUpToolbar(activity!!)
-        }
-    }
-
     override fun onAddCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.run {
-            requestItem.set(item)
-            addCounterItem(item)
-        }
+        shopCartViewModel.addCounterItem(item)
     }
 
     override fun onIncCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.run {
-            requestItem.set(item)
-            onIncCounterItem(item)
-        }
+        shopCartViewModel.onIncCounterItem(item)
     }
 
     override fun onDecCounterItem(item: ProductsItemViewData) {
-        shopCartViewModel.run {
-            requestItem.set(item)
-            checkDecDeleteCounterItem(item)
-        }
-    }
-
-    override fun onGetProductsFromRealm(list: RealmResults<ProductsEntity>?) {
-        shopCartViewModel.setOfflineProducts(list)
+        shopCartViewModel.checkDecDeleteCounterItem(item)
     }
 }

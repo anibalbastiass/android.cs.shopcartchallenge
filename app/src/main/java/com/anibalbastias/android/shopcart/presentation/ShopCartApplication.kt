@@ -15,6 +15,10 @@ fun getAppContext(): ShopCartApplication {
     return context!!
 }
 
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
 class ShopCartApplication : MultiDexApplication() {
 
     companion object {

@@ -17,6 +17,10 @@ import com.bumptech.glide.load.model.stream.BaseGlideUrlLoader
 import com.bumptech.glide.module.AppGlideModule
 import java.io.InputStream
 
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
 @GlideModule
 class ShopCartGlideModule : AppGlideModule() {
     override fun applyOptions(context: Context, builder: GlideBuilder) {

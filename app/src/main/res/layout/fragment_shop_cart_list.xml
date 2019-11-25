@@ -45,23 +45,28 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:padding="8dp"
-                    android:src="@drawable/ic_shopping_cart" />
+                    android:src="@drawable/ic_shopping_cart"
+                    tools:ignore="UnusedAttribute"
+                    tools:targetApi="m"
+                    android:contentDescription="@string/shopCartButtonDescription" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="23dp"
                     android:layout_marginStart="25dp"
+                    android:layout_marginLeft="25dp"
                     android:background="@drawable/box_counter"
                     android:gravity="center"
                     android:minWidth="23dp"
                     android:padding="3dp"
                     android:text="@{``+ shopCartViewModel.shopCartTotalCount}"
                     android:textColor="@color/white"
-                    android:textSize="10sp"
+                    android:textSize="@dimen/sp10"
                     android:visibility="@{shopCartViewModel.shopCartTotalCount > 0 ? View.VISIBLE : View.GONE}"
                     tools:text="1" />
 

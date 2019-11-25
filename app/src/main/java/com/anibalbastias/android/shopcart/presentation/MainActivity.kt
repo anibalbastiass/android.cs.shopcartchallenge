@@ -10,6 +10,10 @@ import com.anibalbastias.android.shopcart.presentation.ui.entry.OnBackPressedLis
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.ShopCartFragment
 import kotlinx.android.synthetic.main.fragment_entry.*
 
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var entryFragment: EntryFragment

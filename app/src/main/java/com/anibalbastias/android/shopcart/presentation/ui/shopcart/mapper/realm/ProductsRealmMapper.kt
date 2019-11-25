@@ -8,6 +8,10 @@ import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.product
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.products.ProductsItemViewData
 import javax.inject.Inject
 
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
 class ProductsRealmMapper @Inject constructor() :
     Mapper<ProductsItemEntity?, ProductsItemViewData?> {
 

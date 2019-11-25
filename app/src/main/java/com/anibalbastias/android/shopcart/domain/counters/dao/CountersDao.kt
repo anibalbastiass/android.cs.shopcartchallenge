@@ -1,5 +1,6 @@
 package com.anibalbastias.android.shopcart.domain.counters.dao
 
+import android.util.Log
 import com.anibalbastias.android.shopcart.domain.counters.model.CounterEntity
 import io.realm.Realm
 import io.realm.RealmObject
@@ -50,7 +51,7 @@ class CountersDao(realm: Realm?) {
             try {
                 item?.deleteFromRealm()
             } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
+                Log.e("ShopCartRealm", e.localizedMessage!!)
             }
         }
     }

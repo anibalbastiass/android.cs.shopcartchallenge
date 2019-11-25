@@ -17,7 +17,6 @@ import com.anibalbastias.android.shopcart.domain.products.model.ProductsItemEnti
 import com.anibalbastias.android.shopcart.domain.products.model.ProductsEntity
 import com.anibalbastias.android.shopcart.domain.products.usecase.GetProductsUseCase
 import com.anibalbastias.android.shopcart.presentation.context
-import com.anibalbastias.android.shopcart.presentation.ui.shopcart.interfaces.GetOfflineProductsListener
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.counters.CounterListViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.products.ProductsViewDataMapper
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.mapper.realm.ProductsRealmMapper
@@ -29,6 +28,10 @@ import com.anibalbastias.android.shopcart.presentation.util.isConnectingToIntern
 import io.realm.RealmList
 import io.realm.RealmResults
 import javax.inject.Inject
+
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
 
 class ShopCartViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
@@ -127,6 +130,8 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun addCounterItem(item: ProductsItemViewData) {
+        requestItem.set(item)
+
         item.mapCounterProduct {
             it?.counter?.set(CounterViewData(count = 1))
 
@@ -139,6 +144,8 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun onIncCounterItem(item: ProductsItemViewData) {
+        requestItem.set(item)
+
         item.mapCounterProduct {
             item.counter?.get()?.id?.let { id ->
                 updateTempCounter(item, 1)
@@ -181,6 +188,8 @@ class ShopCartViewModel @Inject constructor(
     }
 
     fun checkDecDeleteCounterItem(item: ProductsItemViewData) {
+        requestItem.set(item)
+
         if (item.counter?.get()?.count!! > 1)
             onDecCounterItem(item)
         else
@@ -317,10 +326,11 @@ class ShopCartViewModel @Inject constructor(
     //endregion
 
     //region Realm Methods
-    fun loadProductsListAsync(callback: GetOfflineProductsListener?) {
+    fun loadProductsListAsync() {
         val dataList = RealmManager.createProductListDao().loadAllAsync()
         dataList.addChangeListener { t, _ ->
-            callback?.onGetProductsFromRealm(t)
+            // Update data
+            setOfflineProducts(t)
         }
     }
 
@@ -345,7 +355,7 @@ class ShopCartViewModel @Inject constructor(
         }
     }
 
-    fun setOfflineProducts(list: RealmResults<ProductsEntity>?) {
+    private fun setOfflineProducts(list: RealmResults<ProductsEntity>?) {
         val productList = arrayListOf<ProductsItemViewData?>()
 
         if (list?.isNotEmpty() == true) {

@@ -5,6 +5,10 @@ import androidx.databinding.ObservableField
 import com.anibalbastias.android.shopcart.presentation.ui.shopcart.model.counters.CounterViewData
 import kotlinx.android.parcel.Parcelize
 
+/**
+ * Created by anibalbastias on 2019-11-25.
+ */
+
 @Parcelize
 data class ProductsItemViewData(
     var itemId: String? = null,
