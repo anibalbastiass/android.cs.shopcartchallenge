@@ -6,7 +6,6 @@ import androidx.navigation.NavDirections
 
 /**
  * Created by anibal.bastias on 20, August, 2019
- * Copyright (c) 2019 Carsales. All rights reserved.
  */
 interface BaseNavigationListener {
 

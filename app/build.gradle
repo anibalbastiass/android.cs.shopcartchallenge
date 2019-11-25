@@ -116,8 +116,10 @@ dependencies {
     // Roboelectric: Integration tests
     testImplementation testDependencies.robolectric
     testImplementation testDependencies.robolectricMultidex
+    testImplementation testDependencies.roboShadowsDex
     testImplementation testDependencies.mockitoKotlin
     testImplementation testDependencies.androidXTestCore
+    testImplementation testDependencies.mockitoInline
 
     // Espresso: Instrumental tests
     androidTestImplementation testDependencies.testRunner

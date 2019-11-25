@@ -207,14 +207,16 @@ ext {
             lifecycleCompiler  : "android.arch.lifecycle:compiler:$androidArchVersion",
             testRunner         : "androidx.test:runner:1.2.0",
             espressoCore       : "androidx.test.espresso:espresso-core:3.2.0",
-            robolectric        : 'org.robolectric:robolectric:4.2',
-            robolectricMultidex: "org.robolectric:multidex:3.4.2",
+            robolectric        : 'org.robolectric:robolectric:4.0.2',
+            roboShadowsDex     : "org.robolectric:shadows-multidex:4.0.1",
+            robolectricMultidex: "org.robolectric:shadows-multidex:4.0.1",
             mockitoKotlin      : 'com.nhaarman:mockito-kotlin:1.5.0',
             androidXTestCore   : 'androidx.test:core:1.2.0',
             activityKtx        : "androidx.activity:activity-ktx:1.1.0-rc02",
             fragmentKtx        : "androidx.navigation:navigation-fragment-ktx:2.2.0-rc02",
             navigationKtx      : "androidx.navigation:navigation-ui-ktx:2.2.0-rc02",
             coreKtx            : 'androidx.core:core-ktx:1.2.0-rc01',
-            saveStateKtx       : 'androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02'
+            saveStateKtx       : 'androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02',
+            mockitoInline      : "org.mockito:mockito-inline:3.0.0"
     ]
 }

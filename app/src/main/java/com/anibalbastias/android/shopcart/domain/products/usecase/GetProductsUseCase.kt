@@ -1,6 +1,6 @@
 package com.anibalbastias.android.shopcart.domain.products.usecase
 
-import au.com.carsales.apibaselib.domain.interactor.FlowableUseCase
+import com.anibalbastias.android.shopcart.domain.base.interactor.FlowableUseCase
 import com.anibalbastias.android.shopcart.data.dataStoreFactory.products.model.ProductsData
 import com.anibalbastias.android.shopcart.domain.base.executor.APIPostExecutionThread
 import com.anibalbastias.android.shopcart.domain.base.executor.APIThreadExecutor
