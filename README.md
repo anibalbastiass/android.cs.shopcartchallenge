@@ -1,7 +1,7 @@
-# Cornershop Cart app with dynamic counters
+# ShopCart app with dynamic counters
 > Challenge app for Android Engineer technical test, very useful and funny app for apply Android Architecture components.
 
-This project is a Cornershop technical test for apply Android Enginner job. 
+This project is a technical test for apply Android Enginner job. 
 Goal: Build a app consuming a ElasticBeanstalk AWS NodeJS instance with a API REST for CRUD counter cart and keep persistence between API REST and local database. Observable vars and ViewModel/LiveData refresh data when is changing counters.
 
 ## Steps
